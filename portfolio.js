@@ -10,7 +10,9 @@ const projects = [
   { title: 'CombiLift — Exhibition Highlights', category: 'Exhibition Highlights', video: 'https://youtu.be/Mecq3Hjvk2w' },
   { title: 'Vivienne Sabo — Exhibition Highlights', category: 'Exhibition Highlights', video: 'https://youtu.be/UdkRDUl_-9c' },
   { title: 'Product AI Video 01', category: 'AI, 3D & CGI', video: 'https://youtu.be/LXxnDw2XH3M' },
-  { title: 'Product AI Video 02', category: 'AI, 3D & CGI', video: 'https://youtu.be/_Y2UQGPugXk' }
+  { title: 'Product AI Video 02', category: 'AI, 3D & CGI', video: 'https://youtu.be/_Y2UQGPugXk' },
+  { title: 'Luxora CGI', category: 'AI, 3D & CGI', video: 'https://youtu.be/-XoRdX4MGJ4' },
+  { title: 'Nylaa 3D', category: 'AI, 3D & CGI', video: 'https://youtu.be/nfg0E2pQvQ8' }
 ];
 
 const modal = document.getElementById('modal');
