@@ -14,7 +14,8 @@ const projects = [
   { title: 'Luxora CGI', category: 'AI, 3D & CGI', video: 'https://youtu.be/-XoRdX4MGJ4' },
   { title: 'Nylaa 3D', category: 'AI, 3D & CGI', video: 'https://youtu.be/nfg0E2pQvQ8' },
   { title: 'Hayatna', category: 'Reels', video: 'https://youtube.com/shorts/2Tf0JE0u3pA?feature=share' },
-  { title: 'House of Pops', category: 'Reels', video: 'https://youtube.com/shorts/4h_ml2k2gL8?feature=share' }
+  { title: 'House of Pops', category: 'Reels', video: 'https://youtube.com/shorts/4h_ml2k2gL8?feature=share' },
+  { title: 'KDR Reel', category: 'Reels', video: 'https://youtube.com/shorts/DsWOJwstTno?feature=share' }
 ];
 
 const modal = document.getElementById('modal');
