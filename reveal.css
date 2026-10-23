@@ -1,4 +1,8 @@
 /* The alpha channel of the unchanged original PNG defines the logo silhouette. */
+.reels-rail { grid-auto-columns: clamp(180px, 22%, 250px); }
+.reels-rail .poster { aspect-ratio: 9 / 16; }
+dialog.modal-reel { width: min(420px, 95vw, calc((100dvh - 160px) * 9 / 16)); max-height: 95dvh; }
+.modal-reel .player { aspect-ratio: 9 / 16; }
 .cinematic-hero {
   min-height: 680px;
   display: grid;

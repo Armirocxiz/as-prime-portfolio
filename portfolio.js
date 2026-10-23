@@ -12,7 +12,9 @@ const projects = [
   { title: 'Product AI Video 01', category: 'AI, 3D & CGI', video: 'https://youtu.be/LXxnDw2XH3M' },
   { title: 'Product AI Video 02', category: 'AI, 3D & CGI', video: 'https://youtu.be/_Y2UQGPugXk' },
   { title: 'Luxora CGI', category: 'AI, 3D & CGI', video: 'https://youtu.be/-XoRdX4MGJ4' },
-  { title: 'Nylaa 3D', category: 'AI, 3D & CGI', video: 'https://youtu.be/nfg0E2pQvQ8' }
+  { title: 'Nylaa 3D', category: 'AI, 3D & CGI', video: 'https://youtu.be/nfg0E2pQvQ8' },
+  { title: 'Hayatna', category: 'Reels', video: 'https://youtube.com/shorts/2Tf0JE0u3pA?feature=share' },
+  { title: 'House of Pops', category: 'Reels', video: 'https://youtube.com/shorts/4h_ml2k2gL8?feature=share' }
 ];
 
 const modal = document.getElementById('modal');
@@ -21,7 +23,7 @@ const player = document.getElementById('player');
 function openProject(index) {
   const project = projects[index];
   if (!project) return;
-  const id = project.video.match(/youtu\.be\/([\w-]{11})$/)?.[1];
+  const id = project.video.match(/(?:youtu\.be\/|youtube\.com\/shorts\/)([\w-]{11})(?:[?&#].*)?$/)?.[1];
   if (!id) return;
 
   document.getElementById('title').textContent = project.title;
@@ -41,6 +43,7 @@ function openProject(index) {
   iframe.allowFullscreen = true;
   iframe.referrerPolicy = 'strict-origin-when-cross-origin';
   player.replaceChildren(iframe);
+  modal.classList.toggle('modal-reel', project.category === 'Reels');
   modal.showModal();
 }
 
