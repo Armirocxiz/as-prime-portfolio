@@ -202,3 +202,21 @@ footer { letter-spacing:.04em; }
   .reels-grid h4 { font-size:15px; }
   .photography-section h2 { font-size:28px; }
 }
+
+/* Production context and a larger opening film. */
+.production-intro { margin:16px 0 10px; max-width:650px; color:#b5b2ad; font-size:14px; line-height:1.7; }
+.tile-note { margin:7px 0 0; color:#b5b2ad; font-size:12px; line-height:1.6; }
+.details .project-description { flex-basis:100%; margin:0; font-size:13px; line-height:1.6; color:#c3c0ba; }
+@media (min-width:1050px) {
+  #highlights .project-grid { grid-template-columns:repeat(12,minmax(0,1fr)); }
+  #highlights .tile { grid-column:span 4; }
+  #highlights .tile:first-child { grid-column:span 8; grid-row:span 2; display:flex; flex-direction:column; }
+  #highlights .tile:first-child .poster { flex:1; aspect-ratio:auto; min-height:360px; }
+  #highlights .tile:first-child h4 { font-size:23px; margin-top:17px; }
+}
+@media (max-width:650px) {
+  .collection-heading .eyebrow { max-width:190px; font-size:9px; line-height:1.6; }
+  .production-intro { font-size:12px; margin-top:14px; }
+  .tile-note { font-size:11px; }
+  .modal-reel .details { padding:12px 14px; gap:8px; }
+}
