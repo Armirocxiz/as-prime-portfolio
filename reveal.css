@@ -55,8 +55,8 @@
   -webkit-mask: url('assets/as-prime-sharp.svg') center / 100% 100% no-repeat;
   mask: url('assets/as-prime-sharp.svg') center / 100% 100% no-repeat;
 }
-.logo-scenes { position: absolute; inset: -10%; display: block; background: #0d190b; }
-.logo-scenes img { position: absolute; inset: 0; opacity: 0; width: 100%; height: 100%; object-fit: cover; filter: saturate(.8) brightness(1.25); }
+.logo-scenes { position: absolute; inset: -8%; display: block; background: #0d190b url('assets/as-prime-projection.webp') 0 0 / 800% 600% no-repeat; filter: saturate(.85) brightness(.95); }
+.projection-preload { display: none; }
 .hero-flare {
   position: absolute;
   inset: 0;
@@ -84,25 +84,20 @@
 .reveal-replay[hidden] { display: none; }
 .reveal-replay svg { width: 14px; height: 14px; }
 .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; border: 0; }
-.is-playing .scene-wall { animation: sceneWall 5.8s both; }
-.is-playing .scene-wall figure { animation: sceneSlide 2.6s cubic-bezier(.2,.7,.2,1) both; }
-.is-playing .scene-wall figure:nth-child(even) { animation-name: sceneSlideReverse; }
-.is-playing .logo-lockup { animation: logoSettle 5.8s cubic-bezier(.2,.7,.2,1) both; }
-.is-playing .actual-logo { animation: logoFinish 5.8s both; }
-.is-playing .logo-window { animation: logoMontage 5.8s both; }
-.is-playing .logo-scenes { animation: montagePan 5.8s cubic-bezier(.2,.7,.2,1) both; }
-.is-playing .logo-scenes img { animation: productionCut .46s linear var(--shot-delay) both; }
-.is-playing .hero-flare { animation: revealSweep 5.8s both; }
-.is-playing .reveal-line { animation: lineFinish 5.8s both; }
+.is-playing .logo-lockup { animation: logoSettle 4.4s cubic-bezier(.2,.7,.2,1) both; }
+.is-playing .actual-logo { animation: logoFinish 4.4s both; }
+.is-playing .logo-window { animation: logoMontage 4.4s both; }
+.is-playing .logo-scenes { animation: projectionCuts 3.6s steps(1, end) both, montagePan 4.4s linear both; }
+.is-playing .is-playing .hero-flare { animation: revealSweep 4.4s both; }
+.is-playing .reveal-line { animation: lineFinish 4.4s both; }
 @keyframes sceneWall { 0% { opacity: 0; transform: scale(1.12); } 10%, 30% { opacity: .9; } 55%, 100% { opacity: 0; transform: scale(.96); } }
 @keyframes sceneSlide { from { transform: translateY(-32%); } to { transform: translateY(0); } }
 @keyframes sceneSlideReverse { from { transform: translateY(32%); } to { transform: translateY(0); } }
-@keyframes logoSettle { 0%, 14% { transform: scale(2); } 64%, 100% { transform: none; } }
-@keyframes logoFinish { 0%, 36% { opacity: 0; } 68%, 100% { opacity: 1; } }
-@keyframes logoMontage { 0%, 52% { opacity: 1; } 72%, 100% { opacity: 0; } }
+@keyframes logoSettle { 0% { transform: scale(1.8); } 82%, 100% { transform: none; } }
+@keyframes logoFinish { 0%, 80% { opacity: 0; } 100% { opacity: 1; } }
+@keyframes logoMontage { 0%, 82% { opacity: 1; } 100% { opacity: 0; } }
 @keyframes montagePan { 0% { transform: translate(-8%, -10%) scale(1.15); } 100% { transform: translate(8%, 10%) scale(1); } }
-@keyframes productionCut { 0% { opacity: 0; transform: scale(1.12); } 1%, 98% { opacity: 1; } 99%, 100% { opacity: 0; transform: scale(1); } }
-@keyframes revealSweep { 0%, 45% { opacity: 0; transform: translateX(-120%); } 50% { opacity: .8; } 72%, 100% { opacity: 0; transform: translateX(120%); } }
+@keyframes revealSweep { 0%, 80% { opacity: 0; transform: translateX(-120%); } 86% { opacity: .65; } 100% { opacity: 0; transform: translateX(120%); } }
 @keyframes lineFinish { 0%, 52% { opacity: 0; transform: scaleX(.1); } 85%, 100% { opacity: 1; transform: scaleX(1); } }
 html { scroll-padding-top: 90px; }
 :focus-visible { outline: 2px solid var(--lime); outline-offset: 5px; }
@@ -125,4 +120,57 @@ body:has(dialog[open]) { overflow: hidden; }
   .cinematic-hero *, .poster img { animation: none !important; transition: none !important; }
   .scene-wall, .logo-window, .hero-flare, .reveal-replay { display: none; }
   .actual-logo { opacity: 1; }
+}
+
+/* 48 mixed portfolio frames, one cut every 75 ms. */
+@keyframes projectionCuts {
+  0.00000% { background-position: 0.00000% 0.00000%; }
+  2.08333% { background-position: 14.28571% 0.00000%; }
+  4.16667% { background-position: 28.57143% 0.00000%; }
+  6.25000% { background-position: 42.85714% 0.00000%; }
+  8.33333% { background-position: 57.14286% 0.00000%; }
+  10.41667% { background-position: 71.42857% 0.00000%; }
+  12.50000% { background-position: 85.71429% 0.00000%; }
+  14.58333% { background-position: 100.00000% 0.00000%; }
+  16.66667% { background-position: 0.00000% 20.00000%; }
+  18.75000% { background-position: 14.28571% 20.00000%; }
+  20.83333% { background-position: 28.57143% 20.00000%; }
+  22.91667% { background-position: 42.85714% 20.00000%; }
+  25.00000% { background-position: 57.14286% 20.00000%; }
+  27.08333% { background-position: 71.42857% 20.00000%; }
+  29.16667% { background-position: 85.71429% 20.00000%; }
+  31.25000% { background-position: 100.00000% 20.00000%; }
+  33.33333% { background-position: 0.00000% 40.00000%; }
+  35.41667% { background-position: 14.28571% 40.00000%; }
+  37.50000% { background-position: 28.57143% 40.00000%; }
+  39.58333% { background-position: 42.85714% 40.00000%; }
+  41.66667% { background-position: 57.14286% 40.00000%; }
+  43.75000% { background-position: 71.42857% 40.00000%; }
+  45.83333% { background-position: 85.71429% 40.00000%; }
+  47.91667% { background-position: 100.00000% 40.00000%; }
+  50.00000% { background-position: 0.00000% 60.00000%; }
+  52.08333% { background-position: 14.28571% 60.00000%; }
+  54.16667% { background-position: 28.57143% 60.00000%; }
+  56.25000% { background-position: 42.85714% 60.00000%; }
+  58.33333% { background-position: 57.14286% 60.00000%; }
+  60.41667% { background-position: 71.42857% 60.00000%; }
+  62.50000% { background-position: 85.71429% 60.00000%; }
+  64.58333% { background-position: 100.00000% 60.00000%; }
+  66.66667% { background-position: 0.00000% 80.00000%; }
+  68.75000% { background-position: 14.28571% 80.00000%; }
+  70.83333% { background-position: 28.57143% 80.00000%; }
+  72.91667% { background-position: 42.85714% 80.00000%; }
+  75.00000% { background-position: 57.14286% 80.00000%; }
+  77.08333% { background-position: 71.42857% 80.00000%; }
+  79.16667% { background-position: 85.71429% 80.00000%; }
+  81.25000% { background-position: 100.00000% 80.00000%; }
+  83.33333% { background-position: 0.00000% 100.00000%; }
+  85.41667% { background-position: 14.28571% 100.00000%; }
+  87.50000% { background-position: 28.57143% 100.00000%; }
+  89.58333% { background-position: 42.85714% 100.00000%; }
+  91.66667% { background-position: 57.14286% 100.00000%; }
+  93.75000% { background-position: 71.42857% 100.00000%; }
+  95.83333% { background-position: 85.71429% 100.00000%; }
+  97.91667% { background-position: 100.00000% 100.00000%; }
+  100% { background-position: 100% 100%; }
 }
