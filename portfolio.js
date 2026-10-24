@@ -2,10 +2,11 @@
 
 const projects = [
   {
-    "title": "NRL",
+    "title": "Complex ideas, explained in an AI-made video",
     "category": "AI, 3D & CGI",
     "video": "https://youtu.be/z75wz71KKz0",
-    "description": "An AI-led explainer film."
+    "description": "Complex ideas, explained in an AI-made video",
+    "brand": "NRL"
   },
   {
     "title": "Exhibition day, cut into a film with a point of view",
@@ -57,58 +58,67 @@ const projects = [
     "brand": "Vivienne Sabo"
   },
   {
-    "title": "Fragrance study",
+    "title": "AI product visuals for e-commerce, no studio needed",
     "category": "AI, 3D & CGI",
     "video": "https://youtu.be/LXxnDw2XH3M",
-    "description": "An AI-led fragrance product study."
+    "description": "AI product visuals for e-commerce, no studio needed",
+    "brand": "Fragrance study"
   },
   {
-    "title": "Fragrance story",
+    "title": "Product page video, made with AI at catalogue scale",
     "category": "AI, 3D & CGI",
     "video": "https://youtu.be/_Y2UQGPugXk",
-    "description": "An AI-led fragrance product story."
+    "description": "Product page video, made with AI at catalogue scale",
+    "brand": "Fragrance story"
   },
   {
-    "title": "Luxora",
+    "title": "Luxury CGI that makes the bottle the hero",
     "category": "AI, 3D & CGI",
     "video": "https://youtu.be/-XoRdX4MGJ4",
-    "description": "A CGI fragrance product film."
+    "description": "Luxury CGI that makes the bottle the hero",
+    "brand": "Luxora"
   },
   {
-    "title": "Nylaa",
+    "title": "3D product video, short and made to stop the scroll",
     "category": "AI, 3D & CGI",
     "video": "https://youtu.be/nfg0E2pQvQ8",
-    "description": "A 3D fragrance product film."
+    "description": "3D product video, short and made to stop the scroll",
+    "brand": "Nylaa"
   },
   {
-    "title": "Hayatna",
+    "title": "Exhibition day, cut into a reel people actually watch",
     "category": "Reels",
     "video": "https://youtube.com/shorts/2Tf0JE0u3pA?feature=share",
-    "description": "Brand moments in a vertical edit."
+    "description": "Exhibition day, cut into a reel people actually watch",
+    "brand": "Hayatna"
   },
   {
-    "title": "House of Pops",
+    "title": "Exhibition buzz, packed into a vertical reel",
     "category": "Reels",
     "video": "https://youtube.com/shorts/4h_ml2k2gL8?feature=share",
-    "description": "Food and lifestyle in a vertical edit."
+    "description": "Exhibition buzz, packed into a vertical reel",
+    "brand": "House of Pops"
   },
   {
-    "title": "KDR",
+    "title": "Exhibition highlights, cut as a reel for Instagram",
     "category": "Reels",
     "video": "https://youtube.com/shorts/DsWOJwstTno?feature=share",
-    "description": "A vertical brand reel."
+    "description": "Exhibition highlights, cut as a reel for Instagram",
+    "brand": "KDR"
   },
   {
-    "title": "Founder's Diary",
+    "title": "A day at the exhibition, through the owner's eyes",
     "category": "Reels",
     "video": "https://youtube.com/shorts/HD4arC9fyco?feature=share",
-    "description": "A founder story, made for social."
+    "description": "A day at the exhibition, through the owner's eyes",
+    "brand": "Founder's Diary"
   },
   {
-    "title": "Clinic",
+    "title": "Inside the practice, shown as a reel patients trust",
     "category": "Reels",
     "video": "https://youtube.com/shorts/_fsVwJUfR2E?feature=share",
-    "description": "A clinic reel, made for social."
+    "description": "Inside the practice, shown as a reel patients trust",
+    "brand": "Clinic"
   },
   {
     "title": "Store launch, captured so the doors open to a crowd",
@@ -125,22 +135,25 @@ const projects = [
     "brand": "National Feed"
   },
   {
-    "title": "Fashion portrait",
+    "title": "Scroll-stopping fashion, vertical-first",
     "category": "Reels",
     "video": "https://youtube.com/shorts/Hse6ee8_Ev8?feature=share",
-    "description": "A fashion portrait in motion."
+    "description": "Scroll-stopping fashion, vertical-first",
+    "brand": "Fashion portrait"
   },
   {
-    "title": "Fashion editorial",
+    "title": "Editorial style at reel speed",
     "category": "Reels",
     "video": "https://youtube.com/shorts/QB1P9u8cpec?feature=share",
-    "description": "A vertical fashion editorial."
+    "description": "Editorial style at reel speed",
+    "brand": "Fashion editorial"
   },
   {
-    "title": "Amber Rush",
+    "title": "A fragrance launch with no physical shoot",
     "category": "AI, 3D & CGI",
     "video": "https://youtu.be/L44ugCS6ekY",
-    "description": "A CGI fragrance product film."
+    "description": "A fragrance launch with no physical shoot",
+    "brand": "Amber Rush"
   }
 ];
 
