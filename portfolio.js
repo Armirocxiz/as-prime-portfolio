@@ -185,13 +185,19 @@ document.querySelectorAll('.tile').forEach(tile => {
   });
 });
 
-// The original logo montage now plays once in the compact header mark.
+// Play the original montage on load and restart it whenever the header logo is pressed.
 const stage = document.getElementById('logo-reveal');
 const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
 if (stage) {
-  Promise.allSettled(Array.from(stage.querySelectorAll('img'),img => img.decode())).then(() => {
-    if (!reducedMotion.matches) stage.classList.add('is-playing');
-  });
+  function playLogoReveal() {
+    stage.classList.remove('is-playing');
+    if (reducedMotion.matches) return;
+    // Commit the reset so another press restarts even a reveal already in progress.
+    void stage.offsetWidth;
+    stage.classList.add('is-playing');
+  }
+  stage.addEventListener('click',playLogoReveal);
+  Promise.allSettled(Array.from(stage.querySelectorAll('img'),img => img.decode())).then(playLogoReveal);
   reducedMotion.addEventListener('change', () => {
     if (reducedMotion.matches) stage.classList.remove('is-playing');
   });

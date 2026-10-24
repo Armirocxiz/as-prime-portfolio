@@ -24,4 +24,4 @@ Tap opens. A 320 ms touch/pen hold previews the prints; moving more than 12 px c
 
 ## Compact portfolio variant
 
-The large hero section and replay control are removed. The exact original SVG and montage now live in the top-left header mark, which stays legible while the montage runs once. Work follows the header immediately. The heading is a concise Portfolio h1, navigation is Work/Contact, and the contact area contains just its heading and two contact actions. All 22 films, 31 photos, folders, players and responsive interactions are preserved.
+The large hero section and replay control are removed. The exact original SVG and montage now live in the top-left header mark, which stays legible while the montage runs on load and replays whenever the logo is pressed. Work follows the header immediately. The heading is a concise Portfolio h1, navigation is Work/Contact, and the contact area contains just its heading and two contact actions. All 22 films, 31 photos, folders, players and responsive interactions are preserved.
