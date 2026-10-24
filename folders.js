@@ -23,71 +23,68 @@ let transitionVersion = 0;
 let closingFolder = null;
 let finishPendingClose = null;
 
-function clearPanelStyles(panel) {
-  ['height', 'padding-top', 'padding-bottom', 'opacity'].forEach(property => panel.style.removeProperty(property));
+function clearFolderStyles() {
+  folderStack.querySelectorAll('.folder-shell').forEach(shell => {
+    shell.style.removeProperty('height');
+    shell.classList.remove('is-resizing');
+  });
 }
 
 function cancelFolderAnimations() {
   collectionStrips.forEach(strip => strip.cancel());
   activeAnimations.forEach(animation => animation.cancel());
   activeAnimations = [];
-  folderPanels.forEach(clearPanelStyles);
-  folderStack.querySelectorAll('.tile, .photo-card').forEach(card => {
-    card.style.removeProperty('opacity');
-    card.style.removeProperty('transform');
-  });
+  clearFolderStyles();
 }
 
 function folderPositions() {
-  return new Map(folderButtons.map(button => [button.dataset.collection, button.closest('.folder-shell').getBoundingClientRect()]));
+  return new Map(folderButtons.map(button => [button.dataset.collection,button.closest('.folder-shell').getBoundingClientRect()]));
 }
 
-function unfoldFolders(before, selected) {
-  if (folderMotion.matches) return;
-  folderButtons.forEach(button => {
+// Only shell height changes. Its media keeps a constant size throughout the motion.
+function animateFolderLayout(before, version, {closing = false, onFinished = () => {}} = {}) {
+  const stackStyle = getComputedStyle(folderStack);
+  const step = parseFloat(stackStyle.getPropertyValue('--folder-step'));
+  const front = parseFloat(stackStyle.getPropertyValue('--folder-front-height'));
+  const changes = folderButtons.map((button,index) => {
     const shell = button.closest('.folder-shell');
-    const from = before.get(button.dataset.collection);
-    const to = shell.getBoundingClientRect();
-    if (!from || !to.width) return;
-    const transform = `translate(${from.left-to.left}px,${from.top-to.top}px) scaleX(${from.width/to.width})`;
-    const start = {transform,transformOrigin:'top left'};
-    const end = {transform:'translate(0,0) scaleX(1)',transformOrigin:'top left'};
-    const controls = shell.animate([start,end], {duration:selected ? 520 : 400,easing:'cubic-bezier(.22,1,.36,1)'});
+    const from = before.get(button.dataset.collection)?.height ?? shell.getBoundingClientRect().height;
+    const to = closing && button.dataset.collection === closingFolder
+      ? (index === folderButtons.length-1 ? front : step)
+      : shell.getBoundingClientRect().height;
+    return {shell,from,to};
+  }).filter(({from,to}) => Math.abs(from-to) > .5);
+  if (folderMotion.matches || !changes.length) { onFinished(); return; }
+  changes.forEach(({shell,from}) => {
+    shell.style.height = `${from}px`;
+    shell.classList.add('is-resizing');
+  });
+  const finished = changes.map(({shell,from,to}) => {
+    const controls = motionAnimate
+      ? motionAnimate(shell,{height:[from,to]},{type:'tween',duration:closing ? .3 : .4,ease:[.32,0,.2,1]})
+      : shell.animate([{height:`${from}px`},{height:`${to}px`}],{duration:closing ? 300 : 400,easing:'cubic-bezier(.32,0,.2,1)',fill:'forwards'});
     activeAnimations.push({cancel:() => controls.cancel()});
-    controls.finished.catch(() => {});
+    const done = motionAnimate ? Promise.resolve(controls) : controls.finished;
+    return done.catch(() => {});
   });
-}
-
-function animateFolderHeight(panel, expanding, version, onPrepared = () => {}, onFinished = () => {}) {
-  const style = getComputedStyle(panel);
-  const natural = {height:panel.getBoundingClientRect().height,paddingTop:parseFloat(style.paddingTop),paddingBottom:parseFloat(style.paddingBottom),opacity:parseFloat(style.opacity)};
-  const closed = {height:0,paddingTop:0,paddingBottom:0,opacity:0};
-  const first = expanding ? closed : natural;
-  const last = expanding ? natural : closed;
-  const frame = metrics => ({height:`${metrics.height}px`,paddingTop:`${metrics.paddingTop}px`,paddingBottom:`${metrics.paddingBottom}px`,opacity:metrics.opacity});
-  Object.assign(panel.style,frame(first));
-  onPrepared();
-  const controls = panel.animate([frame(first),frame(last)], {duration:expanding ? 520 : 360,easing:'cubic-bezier(.22,1,.36,1)',fill:'forwards'});
-  activeAnimations.push({cancel:() => controls.cancel()});
-  controls.finished.then(() => {
+  Promise.all(finished).then(() => {
     if (version !== transitionVersion) return;
-    clearPanelStyles(panel);
-    controls.cancel();
+    activeAnimations.forEach(animation => animation.cancel());
+    activeAnimations = [];
+    clearFolderStyles();
     onFinished();
-  }).catch(() => {});
+  });
 }
 
-function revealProjects(panel, version) {
-  if (!motionAnimate || folderMotion.matches) return;
-  const cards = Array.from(panel.querySelectorAll('.tile:not([hidden]), .photo-card:not([hidden])')).slice(0,9);
-  const controls = motionAnimate(cards, { opacity:[0,1], y:[10,0] }, {
-    type:'tween', duration:.28, delay:window.Motion.stagger(.025, {startDelay:.16}), ease:[.2,.7,.2,1]
+function warmCollection(id) {
+  const section = collectionSections.find(section => section.id === id);
+  if (!section) return;
+  const limit = compactFolders.matches ? 2 : 9;
+  Array.from(section.querySelectorAll('img')).slice(0,limit).forEach(img => {
+    img.loading = 'eager';
+    img.decoding = 'async';
+    img.decode().catch(() => {});
   });
-  activeAnimations.push({ cancel:() => controls.cancel() });
-  Promise.resolve(controls).then(() => {
-    if (version !== transitionVersion) return;
-    cards.forEach(card => { card.style.removeProperty('opacity'); card.style.removeProperty('transform'); });
-  }).catch(() => {});
 }
 
 // Every item stays accessible in a single-height, touch-scrollable film strip.
@@ -295,8 +292,6 @@ function showCollection(id, { scroll = false, focus = true, updateUrl = true } =
   const before = folderPositions();
   const target = collectionSections.find(section => section.id === id);
   if (!target && id !== 'all') return;
-  const sourceButton = folderButtons.find(button => button.dataset.collection === id);
-  const sourceTop = sourceButton?.getBoundingClientRect().top;
   resetFolders();
   openFolder = id;
   if (id === 'all') {
@@ -311,62 +306,51 @@ function showCollection(id, { scroll = false, focus = true, updateUrl = true } =
     target.hidden = false;
     panel.hidden = false;
     folderStack.classList.add('has-open');
-      button.closest('.folder-shell').classList.add('is-open');
+    button.closest('.folder-shell').classList.add('is-open');
     button.setAttribute('aria-expanded', 'true');
     if (focus) button.focus({ preventScroll:true });
   }
   collectionToggle.textContent = id === 'all' ? 'Close film archive ↑' : 'View all 22 films ↗';
   collectionToggle.setAttribute('aria-expanded', String(id === 'all'));
   if (updateUrl) history.replaceState(null, '', id === 'all' ? '#all-films' : `#${id}`);
-  if (!scroll && sourceButton && sourceTop >= 83) {
-    window.scrollBy({ top:sourceButton.getBoundingClientRect().top - sourceTop, behavior:'instant' });
-  }
-  if (scroll) {
+  const finish = () => {
+    if (!scroll) return;
     const anchor = id === 'all' ? collectionTools : folderPanels.get(id).closest('.folder-shell');
-    anchor.scrollIntoView({ behavior:folderMotion.matches ? 'auto' : 'smooth', block:'start' });
-  }
-  if (id !== 'all' && !folderMotion.matches) {
-    const panel = folderPanels.get(id);
-    animateFolderHeight(panel,true,transitionVersion,() => unfoldFolders(before,id));
-    revealProjects(panel,transitionVersion);
+    anchor.scrollIntoView({behavior:folderMotion.matches ? 'auto' : 'smooth',block:'start'});
+  };
+  if (id === 'all') finish();
+  else {
+    warmCollection(id);
+    animateFolderLayout(before,transitionVersion,{onFinished:finish});
   }
 }
 
 function closeCollection({ scroll = false, focus = true, updateUrl = true, animate = true } = {}) {
+  const before = folderPositions();
   const previousId = openFolder || closingFolder;
   const previous = folderButtons.find(button => button.dataset.collection === previousId);
-  const sourceTop = previous?.getBoundingClientRect().top;
   const panel = folderPanels.get(previousId);
-  const from = panel && !panel.hidden ? panel.getBoundingClientRect() : null;
+  const wasOpen = panel && !panel.hidden;
   transitionVersion += 1;
   const version = transitionVersion;
   cancelFolderAnimations();
-  // Semantic state changes immediately, even if an exit animation is interrupted.
   openFolder = null;
+  closingFolder = previousId;
   if (previous) previous.setAttribute('aria-expanded','false');
   if (panel) { panel.inert = true; panel.setAttribute('aria-hidden','true'); }
   collectionToggle.textContent = 'View all 22 films ↗';
   collectionToggle.setAttribute('aria-expanded','false');
-  if (updateUrl) history.replaceState(null, '', '#work');
+  if (updateUrl) history.replaceState(null,'','#work');
   const finish = () => {
     if (version !== transitionVersion) return;
-    const before = folderPositions();
     resetFolders();
-    if (focus) (previous || folderButtons[0]).focus({ preventScroll:true });
+    if (focus) (previous || folderButtons[0]).focus({preventScroll:true});
     else folderButtons[0].classList.add('is-previewing');
-    if (!scroll && previous && sourceTop >= 83) {
-      window.scrollBy({ top:previous.getBoundingClientRect().top - sourceTop, behavior:'instant' });
-    } else if (!scroll && focus && previous && sourceTop < 83) {
-      previous.scrollIntoView({ behavior:'instant', block:'center' });
-    }
-    if (scroll) document.getElementById('work').scrollIntoView({ behavior:folderMotion.matches ? 'auto' : 'smooth', block:'start' });
-    if (from && animate && !scroll) unfoldFolders(before,null);
+    if (scroll) document.getElementById('work').scrollIntoView({behavior:folderMotion.matches ? 'auto' : 'smooth',block:'start'});
   };
-  if (from && animate && !scroll && !folderMotion.matches) {
-    closingFolder = previousId;
-    finishPendingClose = finish;
-    animateFolderHeight(panel,false,version,undefined,finish);
-  } else finish();
+  finishPendingClose = finish;
+  if (wasOpen && animate && !scroll) animateFolderLayout(before,version,{closing:true,onFinished:finish});
+  else finish();
 }
 
 // A quick touch opens; a deliberate hold peeks without blocking page scrolling.
@@ -392,6 +376,7 @@ window.addEventListener('pointercancel', endTouchPreview, {passive:true});
 
 folderButtons.forEach(button => {
   button.addEventListener('pointerenter', () => {
+    warmCollection(button.dataset.collection);
     if (!folderHover.matches || folderStack.classList.contains('has-open')) return;
     folderButtons.forEach(folder => folder.classList.toggle('is-previewing', folder === button));
   });
@@ -399,6 +384,7 @@ folderButtons.forEach(button => {
     if (event.pointerType === 'mouse') button.classList.remove('is-previewing');
   });
   button.addEventListener('pointerdown', event => {
+    warmCollection(button.dataset.collection);
     if (!['touch','pen'].includes(event.pointerType) || folderStack.classList.contains('has-open')) return;
     cancelTouchPreview();
     heldFolder = null;
@@ -466,6 +452,7 @@ collectionToggle.hidden = false;
 folderBrowser.hidden = false;
 document.body.classList.add('folders-ready');
 folderButtons[0].classList.add('is-previewing');
+if ('requestIdleCallback' in window) requestIdleCallback(() => warmCollection('highlights'),{timeout:2000});
 const initialFolder = location.hash.slice(1);
 if (initialFolder === 'all-films' || collectionSections.some(section => section.id === initialFolder)) {
   showCollection(initialFolder === 'all-films' ? 'all' : initialFolder, {focus:false,updateUrl:false});

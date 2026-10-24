@@ -1,8 +1,9 @@
 /* The folder cabinet and its expanding collection panels. */
 .folder-browser[hidden], .collection-tools[hidden], #catalog[hidden], .section[hidden], .folder-content[hidden] { display:none; }
 .folder-browser { overflow-anchor:none; margin:60px auto 70px; max-width:1060px; }
-.folder-stack { position:relative; height:565px; margin:0 auto; max-width:840px; perspective:1600px; isolation:isolate; }
-.folder-shell { --folder-tone:#272725; position:absolute; top:calc(50px + var(--order) * 65px); left:5%; width:90%; height:220px; z-index:calc(1 + var(--order)); scroll-margin-top:112px; }
+.folder-stack { --folder-step:65px; --folder-front-height:220px; position:relative; display:flex; flex-direction:column; padding:50px 0 35px; margin:0 auto; max-width:840px; perspective:1600px; isolation:isolate; }
+.folder-shell { --folder-tone:#272725; position:relative; flex-shrink:0; left:5%; width:90%; height:var(--folder-step); z-index:calc(1 + var(--order)); scroll-margin-top:112px; }
+.folder-shell:last-child { height:var(--folder-front-height); }
 .work-folder { position:relative; top:0; left:0; width:100%; height:220px; padding:0; border:0; background:none; color:#eeeae3; text-align:left; transform:rotateX(-12deg) translateY(0); transform-origin:center bottom; transition:transform .5s cubic-bezier(.2,.75,.2,1); -webkit-tap-highlight-color:transparent; }
 .work-folder::before { content:""; position:absolute; inset:-24px 0 0; }
 .folder-shell:nth-child(2) { --folder-tone:#2d2d2a; }
@@ -58,8 +59,8 @@ body.folders-ready #highlights .tile:first-child h4 { margin-top:13px; font-size
 @media (hover:none), (pointer:coarse) { .folder-desktop-hint { display:none; } .folder-touch-hint { display:inline; } }
 @media (max-width:650px) {
   .folder-browser { margin-top:35px; margin-bottom:48px; }
-  .folder-stack { height:490px; perspective:1000px; }
-  .folder-shell { top:calc(38px + var(--order) * 54px); left:2%; width:96%; height:172px; }
+  .folder-stack { --folder-step:54px; --folder-front-height:172px; padding:38px 0 64px; perspective:1000px; }
+  .folder-shell { left:2%; width:96%; }
   .work-folder { height:172px; }
   .folder-tab { top:-19px; left:13px; height:20px; min-width:145px; padding:3px 10px; font-size:10px; }
   .folder-cover { top:16px; padding:20px 15px; }
@@ -81,8 +82,8 @@ body.folders-ready #highlights .tile:first-child h4 { margin-top:13px; font-size
 }
 
 /* An open collection keeps the same tabbed cabinet, at the same width. */
-.folder-stack.has-open { min-height:565px; display:flex; flex-direction:column; gap:0; height:auto; padding:50px 0 100px; }
-.folder-stack.has-open .folder-shell { position:relative; top:auto; left:5%; width:90%; height:65px; z-index:calc(1 + var(--order)); }
+.folder-stack.has-open { gap:0; }
+.folder-stack.has-open .folder-shell { left:5%; width:90%; height:var(--folder-step); z-index:calc(1 + var(--order)); }
 .folder-stack.has-open .work-folder { display:block; height:65px; transform:none; }
 .folder-stack.has-open .is-open .work-folder { height:90px; }
 .folder-stack.has-open .work-folder::before { display:none; }
@@ -94,9 +95,9 @@ body.folders-ready #highlights .tile:first-child h4 { margin-top:13px; font-size
 .folder-stack.has-open .folder-tab { display:block; }
 .folder-stack.has-open .folder-name { font-size:23px; }
 .folder-stack.has-open .folder-meta { padding-top:0; }
-.folder-stack.has-open .folder-shell:last-child:not(.is-open) { height:160px; }
-.folder-stack.has-open .folder-shell:last-child:not(.is-open) .work-folder { height:160px; }
-.folder-stack.has-open .folder-shell:last-child:not(.is-open) .folder-cover { height:140px; }
+.folder-stack.has-open .folder-shell:last-child:not(.is-open) { height:var(--folder-front-height); }
+.folder-stack.has-open .folder-shell:last-child:not(.is-open) .work-folder { height:var(--folder-front-height); }
+.folder-stack.has-open .folder-shell:last-child:not(.is-open) .folder-cover { height:calc(var(--folder-front-height) - 20px); }
 .folder-stack.has-open .folder-shell:last-child .folder-label,
 .folder-stack.has-open .folder-shell:last-child .folder-meta,
 .folder-stack.has-open .is-open .folder-label,
@@ -112,17 +113,16 @@ body.folders-ready .folder-content .section { margin:0; padding:0; border:0; }
 .folder-content .tile h4 { color:#f2efea; }
 .folder-content .gallery-toggle { margin-bottom:0; }
 @media (max-width:650px) {
-  .folder-stack.has-open { padding-top:38px; padding-bottom:40px; }
-  .folder-stack.has-open .folder-shell { left:2%; width:96%; height:54px; }
+
+  .folder-stack.has-open .folder-shell { left:2%; width:96%; }
   .folder-stack.has-open .work-folder { height:54px; }
   .folder-stack.has-open .is-open .work-folder { height:84px; }
   .folder-stack.has-open .folder-cover { top:16px; height:68px; padding:16px 14px; }
   .folder-stack.has-open .folder-name { font-size:18px; }
   .folder-stack.has-open .folder-meta { gap:9px; }
   .folder-stack.has-open .is-open { height:auto; }
-  .folder-stack.has-open .folder-shell:last-child:not(.is-open),
-  .folder-stack.has-open .folder-shell:last-child:not(.is-open) .work-folder { height:140px; }
-  .folder-stack.has-open .folder-shell:last-child:not(.is-open) .folder-cover { height:124px; }
+
+  .folder-stack.has-open .folder-shell:last-child:not(.is-open) .folder-cover { height:calc(var(--folder-front-height) - 16px); }
   .folder-content { padding:14px 14px 38px; }
 }
 
@@ -161,25 +161,6 @@ body.folders-ready { overflow-anchor:none; }
 /* Touch layouts stay in the page; opening adds real height below the tab. */
 @media (max-width:650px), (max-height:700px) {
   .folder-browser { scroll-margin-top:6px; }
-  .folder-stack:not(.has-open) { height:clamp(340px, calc(100svh - 160px), 490px); }
-  .folder-stack:not(.has-open) .folder-shell { top:calc(38px + var(--order) * clamp(36px, 7svh, 54px)); }
-  .folder-stack.has-open { height:auto; min-height:clamp(340px, calc(100svh - 160px), 490px); padding:38px 0 40px; }
-  .folder-stack.has-open .folder-shell,
-  .folder-stack.has-open .folder-shell:last-child:not(.is-open) { height:44px; flex-shrink:0; }
-  .folder-stack.has-open .work-folder,
-  .folder-stack.has-open .folder-shell:last-child:not(.is-open) .work-folder { height:44px; }
-  .folder-stack.has-open .folder-cover,
-  .folder-stack.has-open .folder-shell:last-child:not(.is-open) .folder-cover { top:12px; height:44px; padding:8px 12px; }
-  .folder-stack.has-open .folder-tab { top:-16px; height:20px; padding:3px 10px; font-size:11px; }
-  .folder-stack.has-open .folder-shell:not(.is-open) .folder-label,
-  .folder-stack.has-open .folder-shell:not(.is-open) .folder-meta { opacity:0; }
-  .folder-stack.has-open .folder-shell.is-open { height:auto; }
-  .folder-stack.has-open .is-open .work-folder { height:64px; flex-shrink:0; }
-  .folder-stack.has-open .is-open .folder-cover { height:52px; }
-  .folder-stack.has-open .folder-name { font-size:17px; }
-  .folder-stack.has-open .folder-label { gap:10px; }
-  .folder-stack.has-open .folder-meta { gap:8px; font-size:11px; }
-  .folder-stack.has-open .folder-number { font-size:10px; }
   .folder-stack.has-open .folder-content { padding:10px 12px 24px; }
   .folder-stack.has-open .folder-content[hidden] { display:none; }
   body.folders-ready .folder-content .section { display:flex; flex-direction:column; min-height:0; }
@@ -219,3 +200,10 @@ body.folders-ready { overflow-anchor:none; }
   .folder-content .poster img, .folder-content .photo-card img { -webkit-user-drag:none; }
   .folder-content .folder-swipe-hint { color:#d0cec7; }
 }
+
+/* The cabinet never switches positioning models while opening. */
+.folder-shell.is-resizing { clip-path:inset(-32px -12px 0 -12px); }
+.folder-content { contain:layout; }
+.folder-stack.has-open .work-folder,
+.folder-stack.has-open .folder-back,
+.folder-stack.has-open .folder-cover { transition:none; }

@@ -4,9 +4,9 @@ The experiment lives only on `portfolio-copy-2026-10-24`. The original portfolio
 
 ## In-page expansion
 
-Every folder remains in normal document flow on PC and mobile. Opening animates the actual panel height and padding from zero to the measured natural size over 520 ms. Later folders, the cabinet caption, contact section and footer are pushed downward by the same layout animation. Closing reverses it over 360 ms. A short transform transition reconciles the stacked cabinet positions; media entry fades/staggers after opening starts. There is no fixed full-screen viewer, page scroll lock or obscured-content inert state.
+Every folder uses the same normal-flow stack when closed or open. The stepped closed geometry is unchanged. Only folder-shell height animates: 400 ms opening, 300 ms closing with one easing curve. The media's dimensions and padding stay constant. There are no simultaneous transforms on other folders, per-thumbnail staggers or scripted scroll compensation. Subsequent folders and page content move through the resulting layout change. The panel establishes layout containment.
 
-Rapid input cancels prior animations and clears owned inline styles. Semantic expanded state changes immediately. Reduced motion opens/closes directly. Once opening finishes, height is automatic so galleries can resize naturally.
+Pointer intent and idle time warm the first visible thumbnails with async decoding. Rapid input cancels/replaces current height animation; reduced motion settles immediately. Inline height is cleared at completion, so view-more galleries retain natural height. Navigation scroll starts after expansion completes. There is no fixed full-screen viewer or page scroll lock.
 
 ## Responsive layouts
 
