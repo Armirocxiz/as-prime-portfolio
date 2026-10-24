@@ -12,6 +12,7 @@ const collectionTools = document.getElementById('collection-tools');
 const folderClose = document.getElementById('folder-close');
 const folderMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
 const folderHover = window.matchMedia('(hover:hover) and (pointer:fine)');
+const compactFolders = window.matchMedia('(max-width:650px), (max-height:700px)');
 const collectionHomes = new Map();
 const folderPanels = new Map();
 let openFolder = null;
@@ -21,6 +22,12 @@ let activeAnimations = [];
 let transitionVersion = 0;
 let closingFolder = null;
 let finishPendingClose = null;
+const folderExit = document.createElement('button');
+folderExit.type = 'button';
+folderExit.className = 'folder-exit';
+folderExit.textContent = 'Back to portfolio ×';
+folderExit.addEventListener('click', () => closeCollection({scroll:true}));
+folderBrowser.prepend(folderExit);
 
 function clearPanelStyles(panel) {
   ['height', 'padding-top', 'padding-bottom', 'opacity'].forEach(property => panel.style.removeProperty(property));
@@ -43,9 +50,11 @@ function panelMetrics(panel) {
 
 function animatePanel(panel, expanding, from = null) {
   const metrics = from || panelMetrics(panel);
-  const values = expanding
+  let values = expanding
     ? { height:[0,metrics.height], paddingTop:[0,metrics.paddingTop], paddingBottom:[0,metrics.paddingBottom], opacity:[0,1] }
     : { height:[metrics.height,0], paddingTop:[metrics.paddingTop,0], paddingBottom:[metrics.paddingBottom,0], opacity:[metrics.opacity,0] };
+  // In a short viewport the cabinet has a fixed budget; fade within that frame.
+  if (compactFolders.matches) values = {opacity:expanding ? [0,1] : [metrics.opacity,0]};
   let animation;
   if (motionAnimate) {
     const controls = motionAnimate(panel, values, {
@@ -77,6 +86,62 @@ function revealProjects(panel, version) {
     cards.forEach(card => { card.style.removeProperty('opacity'); card.style.removeProperty('transform'); });
   }).catch(() => {});
 }
+
+// Every item stays accessible in a single-height, touch-scrollable film strip.
+const collectionStrips = [];
+const obscuredContent = Array.from(document.querySelectorAll('main > section:not(#work), #work > :not(#folder-browser), footer'));
+function syncCabinetFocus() {
+  const active = compactFolders.matches && folderStack.classList.contains('has-open');
+  obscuredContent.forEach(element => { element.inert = active; });
+}
+collectionSections.forEach(section => {
+  const grid = section.querySelector('.project-grid, .photo-grid');
+  const cards = Array.from(grid.children);
+  const controls = document.createElement('div');
+  controls.className = 'folder-pager';
+  const previous = document.createElement('button');
+  const next = document.createElement('button');
+  previous.type = next.type = 'button';
+  previous.textContent = '←';
+  next.textContent = '→';
+  previous.setAttribute('aria-label','Previous project');
+  next.setAttribute('aria-label','Next project');
+  const status = document.createElement('span');
+  status.setAttribute('role','status');
+  status.setAttribute('aria-live','polite');
+  const hint = document.createElement('span');
+  hint.className = 'folder-swipe-hint';
+  hint.textContent = 'Swipe to explore';
+  controls.append(previous,status,hint,next);
+  section.append(controls);
+  const update = () => {
+    const index = Math.max(0, Math.min(cards.length-1, Math.round(grid.scrollLeft / (grid.clientWidth+12))));
+    status.textContent = `${index+1} / ${cards.length}`;
+    previous.disabled = index === 0;
+    next.disabled = index === cards.length-1;
+  };
+  previous.addEventListener('click', () => grid.scrollBy({left:-(grid.clientWidth+12),behavior:folderMotion.matches ? 'instant' : 'smooth'}));
+  next.addEventListener('click', () => grid.scrollBy({left:grid.clientWidth+12,behavior:folderMotion.matches ? 'instant' : 'smooth'}));
+  grid.addEventListener('scroll',update,{passive:true});
+  collectionStrips.push({section,grid,cards,update});
+  update();
+});
+function syncCompactFolders() {
+  syncCabinetFocus();
+  collectionStrips.forEach(({section,cards,update}) => {
+    if (section.matches('[data-photo-gallery]')) {
+      const expanded = section.querySelector('.gallery-toggle').getAttribute('aria-expanded') === 'true';
+      cards.forEach((card,index) => {card.hidden = !compactFolders.matches && !expanded && index >= featuredPhotoCount;});
+    }
+    update();
+  });
+}
+compactFolders.addEventListener('change', () => {
+  cancelFolderAnimations();
+  if (finishPendingClose) finishPendingClose();
+  syncCompactFolders();
+});
+syncCompactFolders();
 
 collectionSections.forEach(section => {
   const home = document.createComment(`Collection home: ${section.id}`);
@@ -132,6 +197,7 @@ function resetFolders() {
     button.setAttribute('aria-expanded', 'false');
   });
   folderStack.classList.remove('has-open');
+  syncCabinetFocus();
   document.getElementById('catalog').hidden = true;
   collectionTools.hidden = true;
 }
@@ -155,6 +221,7 @@ function showCollection(id, { scroll = false, focus = true, updateUrl = true } =
     target.hidden = false;
     panel.hidden = false;
     folderStack.classList.add('has-open');
+    syncCabinetFocus();
     button.closest('.folder-shell').classList.add('is-open');
     button.setAttribute('aria-expanded', 'true');
     if (focus) button.focus({ preventScroll:true });
@@ -170,10 +237,12 @@ function showCollection(id, { scroll = false, focus = true, updateUrl = true } =
   collectionToggle.textContent = id === 'all' ? 'Close film archive ↑' : 'View all 22 films ↗';
   collectionToggle.setAttribute('aria-expanded', String(id === 'all'));
   if (updateUrl) history.replaceState(null, '', id === 'all' ? '#all-films' : `#${id}`);
-  if (!scroll && sourceButton && sourceTop >= 83) {
+  if (!compactFolders.matches && !scroll && sourceButton && sourceTop >= 83) {
     window.scrollBy({ top:sourceButton.getBoundingClientRect().top - sourceTop, behavior:'instant' });
   }
-  if (scroll) {
+  if (compactFolders.matches && id !== 'all') {
+    // The touch cabinet is an in-screen viewer; retain the page's scroll position.
+  } else if (scroll) {
     const anchor = id === 'all' ? collectionTools : folderPanels.get(id).closest('.folder-shell');
     anchor.scrollIntoView({ behavior:folderMotion.matches ? 'auto' : 'smooth', block:'start' });
   }
@@ -200,9 +269,9 @@ function closeCollection({ scroll = false, focus = true, updateUrl = true, anima
     resetFolders();
     if (focus) (previous || folderButtons[0]).focus({ preventScroll:true });
     else folderButtons[0].classList.add('is-previewing');
-    if (!scroll && previous && sourceTop >= 83) {
+    if (!compactFolders.matches && !scroll && previous && sourceTop >= 83) {
       window.scrollBy({ top:previous.getBoundingClientRect().top - sourceTop, behavior:'instant' });
-    } else if (!scroll && focus && previous && sourceTop < 83) {
+    } else if (!compactFolders.matches && !scroll && focus && previous && sourceTop < 83) {
       previous.scrollIntoView({ behavior:'instant', block:'center' });
     }
     if (scroll) document.getElementById('work').scrollIntoView({ behavior:folderMotion.matches ? 'auto' : 'smooth', block:'start' });
@@ -214,13 +283,56 @@ function closeCollection({ scroll = false, focus = true, updateUrl = true, anima
   } else finish();
 }
 
+// A quick touch opens; a deliberate hold peeks without blocking page scrolling.
+let touchPreview = null;
+let touchPreviewTimer = null;
+let heldFolder = null;
+function cancelTouchPreview() {
+  clearTimeout(touchPreviewTimer);
+  touchPreviewTimer = null;
+  touchPreview = null;
+}
+function endTouchPreview(event) {
+  if (!touchPreview || event.pointerId !== touchPreview.pointerId) return;
+  if (event.type === 'pointercancel' || Math.hypot(event.clientX-touchPreview.x,event.clientY-touchPreview.y) > 12) {
+    if (heldFolder) heldFolder.classList.remove('is-previewing');
+    heldFolder = null;
+    cancelTouchPreview();
+  } else if (event.type === 'pointerup') cancelTouchPreview();
+}
+window.addEventListener('pointermove', endTouchPreview, {passive:true});
+window.addEventListener('pointerup', endTouchPreview, {passive:true});
+window.addEventListener('pointercancel', endTouchPreview, {passive:true});
+
 folderButtons.forEach(button => {
   button.addEventListener('pointerenter', () => {
     if (!folderHover.matches || folderStack.classList.contains('has-open')) return;
     folderButtons.forEach(folder => folder.classList.toggle('is-previewing', folder === button));
   });
-  button.addEventListener('pointerleave', () => { button.classList.remove('is-previewing'); });
-  button.addEventListener('click', () => {
+  button.addEventListener('pointerleave', event => {
+    if (event.pointerType === 'mouse') button.classList.remove('is-previewing');
+  });
+  button.addEventListener('pointerdown', event => {
+    if (!['touch','pen'].includes(event.pointerType) || folderStack.classList.contains('has-open')) return;
+    cancelTouchPreview();
+    heldFolder = null;
+    touchPreview = {pointerId:event.pointerId,x:event.clientX,y:event.clientY};
+    touchPreviewTimer = setTimeout(() => {
+      if (!touchPreview) return;
+      heldFolder = button;
+      folderButtons.forEach(folder => folder.classList.toggle('is-previewing', folder === button));
+    }, 320);
+  }, {passive:true});
+  button.addEventListener('contextmenu', event => {
+    if (heldFolder === button) event.preventDefault();
+  });
+  button.addEventListener('click', event => {
+    cancelTouchPreview();
+    if (heldFolder === button && event.detail !== 0) {
+      heldFolder = null;
+      return;
+    }
+    heldFolder = null;
     if (openFolder === button.dataset.collection) closeCollection();
     else showCollection(button.dataset.collection);
   });
@@ -246,6 +358,10 @@ folderClose.addEventListener('click', () => closeCollection({scroll:true}));
 
 document.querySelectorAll('header nav a').forEach(link => {
   const target = link.getAttribute('href').slice(1);
+  if (target === 'contact') {
+    link.addEventListener('click', () => closeCollection({focus:false,animate:false,updateUrl:false}));
+    return;
+  }
   if (!['work', ...collectionSections.map(section => section.id)].includes(target)) return;
   link.addEventListener('click', event => {
     event.preventDefault();
@@ -253,6 +369,8 @@ document.querySelectorAll('header nav a').forEach(link => {
     else showCollection(target, {scroll:true});
   });
 });
+
+document.querySelector('header .logo').addEventListener('click', () => closeCollection({focus:false,animate:false,updateUrl:false}));
 
 // Without JavaScript the original full portfolio remains visible.
 document.querySelectorAll('#catalog .tile').forEach(tile => { tile.hidden = false; });

@@ -11,3 +11,15 @@ The folder experiment lives only on `portfolio-copy-2026-10-24`. The original po
 ## Boundaries
 
 The only layout animation is the height of one folder panel, because its contents must push the remaining folders down. Project entry uses transform/opacity. All original video URLs, photo galleries, keyboard controls, and reduced-motion behavior remain available. No paid services or account credentials are needed.
+
+## Folder continuity
+
+Opening retains the cabinet width, raised tabs, individual folder tones and overlapping covers. Only the selected folder grows to contain its original media. Other folders remain layered above and below it; the interaction does not replace the cabinet with flat accordion rows. Collapsed buttons have bounded hit areas so neighboring tabs remain usable.
+
+## Touch
+
+A quick tap opens a collection. A 320 ms touch/pen hold previews its prints and consumes that gesture’s click. Moving more than 12 px or a native pointer cancellation clears the hold; vertical scrolling and pinch zoom stay native. Keyboard activation remains immediate. The touch hint explains both actions.
+
+## Short viewports
+
+At widths up to 650 px or heights up to 700 px, an open cabinet occupies a fixed viewer below the sticky header, with a Back to portfolio control. The underlying page retains its position, is inert, and does not scroll until the cabinet closes. All five tabs remain visible. The selected folder contains a horizontal snap strip with every item, previous/next 44 px controls and an item count. Portrait media uses contain instead of cropping. Photo strips expose all 19/12 photos; normal desktop gallery limits are restored on resize. The rest of the portfolio remains a regular vertically scrolling page.

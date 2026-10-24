@@ -80,33 +80,50 @@ body.folders-ready #highlights .tile:first-child h4 { margin-top:13px; font-size
   .work-folder, .folder-back, .folder-cover, .folder-print { transition:none; }
 }
 
-/* Opening a folder grows its own frame; its projects stay inside that frame. */
-.folder-stack.has-open { display:flex; flex-direction:column; gap:14px; height:auto; max-width:1060px; padding-top:16px; }
-.folder-stack.has-open .folder-shell { position:relative; top:auto; left:auto; width:100%; height:auto; z-index:auto; }
-.folder-stack.has-open .work-folder { display:block; height:78px; transform:none; }
-.folder-stack.has-open .work-folder::before, .folder-stack.has-open .folder-back, .folder-stack.has-open .folder-tab, .folder-stack.has-open .folder-previews { display:none; }
-.folder-stack.has-open .folder-cover { inset:0; height:78px; align-items:center; padding:20px 26px; border-radius:7px; transform:none; box-shadow:0 6px 20px #0002; }
+/* An open collection keeps the same tabbed cabinet, at the same width. */
+.folder-stack.has-open { display:flex; flex-direction:column; gap:0; height:auto; padding:50px 0 100px; }
+.folder-stack.has-open .folder-shell { position:relative; top:auto; left:5%; width:90%; height:65px; z-index:calc(1 + var(--order)); }
+.folder-stack.has-open .work-folder { display:block; height:65px; transform:none; }
+.folder-stack.has-open .is-open .work-folder { height:90px; }
+.folder-stack.has-open .work-folder::before { display:none; }
+.folder-stack.has-open .folder-back { transform:none; box-shadow:0 -8px 24px #0003; }
+.folder-stack.has-open .folder-previews { display:none; }
+.folder-stack.has-open .folder-cover { inset:20px 0 0; height:70px; align-items:center; padding:18px 24px; transform:none; box-shadow:0 -4px 12px #0002; }
 .folder-stack.has-open .folder-shell .work-folder .folder-cover { transform:none; }
-.folder-stack.has-open .folder-label, .folder-stack.has-open .folder-meta { opacity:1; }
+.folder-stack.has-open .folder-label, .folder-stack.has-open .folder-meta { opacity:0; }
+.folder-stack.has-open .folder-tab { display:block; }
 .folder-stack.has-open .folder-name { font-size:23px; }
 .folder-stack.has-open .folder-meta { padding-top:0; }
-.folder-stack.has-open .is-open .folder-cover { border-radius:7px 7px 0 0; border-bottom-color:#ffffff1c; box-shadow:none; }
-.folder-stack.has-open .work-folder:focus-visible .folder-cover { outline:2px solid #eeeae3; outline-offset:4px; }
-.folder-content { padding:26px; border:1px solid #ffffff39; border-top:0; border-radius:0 0 7px 7px; background:var(--folder-tone); overflow:hidden; }
+.folder-stack.has-open .folder-shell:last-child:not(.is-open) { height:160px; }
+.folder-stack.has-open .folder-shell:last-child:not(.is-open) .work-folder { height:160px; }
+.folder-stack.has-open .folder-shell:last-child:not(.is-open) .folder-cover { height:140px; }
+.folder-stack.has-open .folder-shell:last-child .folder-label,
+.folder-stack.has-open .folder-shell:last-child .folder-meta,
+.folder-stack.has-open .is-open .folder-label,
+.folder-stack.has-open .is-open .folder-meta { opacity:1; }
+.folder-stack.has-open .is-open { height:auto; }
+.folder-stack.has-open .is-open .folder-cover { border-radius:5px 5px 0 0; border-bottom-color:#ffffff1c; box-shadow:none; }
+.folder-stack.has-open .work-folder:focus-visible .folder-back { outline:2px solid #eeeae3; outline-offset:4px; }
+.folder-stack.has-open .work-folder:hover .folder-tab { color:#fff; border-color:#ffffff80; }
+.folder-content { position:relative; padding:24px 24px 52px; border:1px solid #ffffff39; border-top:0; border-radius:0 0 7px 7px; background:var(--folder-tone); overflow:hidden; }
 body.folders-ready .folder-content .section { margin:0; padding:0; border:0; }
 .folder-content .section-heading, .folder-content .photography-section > h2, .folder-content .photography-section > .eyebrow { position:absolute; width:1px; height:1px; margin:-1px; padding:0; overflow:hidden; clip-path:inset(50%); white-space:nowrap; border:0; }
 .folder-content .tile small, .folder-content .tile-note { color:#bbb8b0; }
 .folder-content .tile h4 { color:#f2efea; }
 .folder-content .gallery-toggle { margin-bottom:0; }
-.folder-stack.has-open + .folder-caption { margin-top:30px; }
 @media (max-width:650px) {
-  .folder-stack.has-open { gap:10px; padding-top:0; }
-  .folder-stack.has-open .work-folder, .folder-stack.has-open .folder-cover { height:68px; }
-  .folder-stack.has-open .folder-cover { padding:16px 14px; }
+  .folder-stack.has-open { padding-top:38px; padding-bottom:40px; }
+  .folder-stack.has-open .folder-shell { left:2%; width:96%; height:54px; }
+  .folder-stack.has-open .work-folder { height:54px; }
+  .folder-stack.has-open .is-open .work-folder { height:84px; }
+  .folder-stack.has-open .folder-cover { top:16px; height:68px; padding:16px 14px; }
   .folder-stack.has-open .folder-name { font-size:18px; }
-  .folder-stack.has-open .folder-number { font-size:9px; }
-  .folder-stack.has-open .folder-meta { gap:9px; font-size:9px; }
-  .folder-content { padding:14px; }
+  .folder-stack.has-open .folder-meta { gap:9px; }
+  .folder-stack.has-open .is-open { height:auto; }
+  .folder-stack.has-open .folder-shell:last-child:not(.is-open),
+  .folder-stack.has-open .folder-shell:last-child:not(.is-open) .work-folder { height:140px; }
+  .folder-stack.has-open .folder-shell:last-child:not(.is-open) .folder-cover { height:124px; }
+  .folder-content { padding:14px 14px 38px; }
 }
 
 body.folders-ready { overflow-anchor:none; }
@@ -122,7 +139,7 @@ body.folders-ready { overflow-anchor:none; }
 .work-folder[aria-expanded="true"] .folder-icon-vertical { transform:scaleY(0); }
 .folder-stack.has-open .folder-cover { transition:background .2s, border-color .2s; }
 .folder-stack.has-open .folder-name { font-weight:500; }
-.folder-stack.has-open .work-folder:hover .folder-cover { border-color:#ffffff65; background-color:#ffffff0c; }
+
 .folder-stack.has-open .is-open .folder-cover { border-color:#ffffff4a; border-bottom-color:#ffffff18; }
 .folder-content .tile small, .folder-content .tile-note { font-size:12px; line-height:1.6; }
 .folder-content .tile:focus-visible, .folder-content .photo-card:focus-visible { outline:2px solid #eeeae3; outline-offset:5px; }
@@ -134,3 +151,79 @@ body.folders-ready { overflow-anchor:none; }
   .folder-caption > :last-child { max-width:48%; }
 }
 @media (prefers-reduced-motion:reduce) { .folder-icon-vertical { transition:none; } }
+
+/* Touch keeps native vertical scrolling; holding a folder reveals its prints. */
+.work-folder { touch-action:pan-y pinch-zoom; -webkit-touch-callout:none; user-select:none; }
+.folder-print { pointer-events:none; }
+.folder-touch-hint { line-height:1.6; }
+
+.folder-pager { display:none; }
+/* Keep the five tabs and the active folder within one usable screen. */
+@media (max-width:650px), (max-height:700px) {
+  .folder-browser { scroll-margin-top:6px; }
+  .folder-stack:not(.has-open) { height:clamp(340px, calc(100svh - 160px), 490px); }
+  .folder-stack:not(.has-open) .folder-shell { top:calc(38px + var(--order) * clamp(36px, 7svh, 54px)); }
+  .folder-stack.has-open { height:calc(100svh - 112px); min-height:340px; max-height:650px; padding:24px 0 12px; box-sizing:border-box; }
+  .folder-stack.has-open .folder-shell,
+  .folder-stack.has-open .folder-shell:last-child:not(.is-open) { height:44px; flex-shrink:0; }
+  .folder-stack.has-open .work-folder,
+  .folder-stack.has-open .folder-shell:last-child:not(.is-open) .work-folder { height:44px; }
+  .folder-stack.has-open .folder-cover,
+  .folder-stack.has-open .folder-shell:last-child:not(.is-open) .folder-cover { top:12px; height:44px; padding:8px 12px; }
+  .folder-stack.has-open .folder-tab { top:-16px; height:20px; padding:3px 10px; font-size:11px; }
+  .folder-stack.has-open .folder-shell:not(.is-open) .folder-label,
+  .folder-stack.has-open .folder-shell:not(.is-open) .folder-meta { opacity:0; }
+  .folder-stack.has-open .folder-shell.is-open { display:flex; flex-direction:column; height:auto; min-height:0; flex:1; }
+  .folder-stack.has-open .is-open .work-folder { height:64px; flex-shrink:0; }
+  .folder-stack.has-open .is-open .folder-cover { height:52px; }
+  .folder-stack.has-open .folder-name { font-size:17px; }
+  .folder-stack.has-open .folder-label { gap:10px; }
+  .folder-stack.has-open .folder-meta { gap:8px; font-size:11px; }
+  .folder-stack.has-open .folder-number { font-size:10px; }
+  .folder-stack.has-open .folder-content { display:flex; flex-direction:column; flex:1; min-height:0; padding:10px 12px 24px; }
+  .folder-stack.has-open .folder-content[hidden] { display:none; }
+  body.folders-ready .folder-content .section { display:flex; flex-direction:column; min-height:0; height:100%; }
+  body.folders-ready .folder-content .project-grid,
+  body.folders-ready .folder-content .photo-grid { display:flex; flex:1; min-height:0; gap:12px; overflow-x:auto; overflow-y:hidden; scroll-snap-type:x mandatory; overscroll-behavior-x:contain; scrollbar-width:none; }
+  .folder-content .project-grid::-webkit-scrollbar,
+  .folder-content .photo-grid::-webkit-scrollbar { display:none; }
+  body.folders-ready .folder-content .tile,
+  .folder-content .photo-card { flex:0 0 100%; min-width:0; height:100%; scroll-snap-align:start; scroll-snap-stop:always; }
+  body.folders-ready .folder-content .tile { display:flex; flex-direction:column; }
+  body.folders-ready .folder-content .tile .poster,
+  body.folders-ready .folder-content .tile:first-child .poster { flex:1; min-height:0; aspect-ratio:auto; width:100%; }
+  .folder-content .poster img, .folder-content .photo-card img { object-fit:contain; }
+  body.folders-ready .folder-content .tile h4,
+  body.folders-ready .folder-content .tile:first-child h4 { margin:8px 0 2px; font-size:14px; line-height:1.25; }
+  .folder-content .tile small { font-size:11px; line-height:1.4; }
+  .folder-content .tile-note, .folder-content .gallery-toggle { display:none; }
+  .folder-content .folder-pager { display:flex; align-items:center; flex-shrink:0; gap:10px; min-height:44px; margin-top:4px; font-size:11px; color:#d0cec7; }
+  .folder-pager button { width:44px; height:44px; padding:0; border:0; border-radius:50%; background:#ffffff0a; color:#eeeae3; font-size:20px; }
+  .folder-pager button:disabled { opacity:.25; }
+  .folder-pager button:focus-visible { outline:2px solid #eeeae3; outline-offset:1px; }
+  .folder-pager > :last-child { margin-left:auto; }
+  .folder-swipe-hint { margin-left:auto; color:#aaa89f; }
+  .folder-stack.has-open + .folder-caption { display:none; }
+}
+
+.folder-exit { display:none; }
+@media (max-width:650px), (max-height:700px) {
+  body:has(.folder-stack.has-open) { overflow:hidden; }
+  .folder-browser:has(.has-open) { position:fixed; inset:82px 0 0; z-index:40; max-width:none; margin:0; padding:0 12px; background:#101010; }
+  .folder-stack.has-open { height:100%; min-height:0; max-height:none; padding:56px 0 20px; }
+  .folder-browser:has(.has-open) .folder-exit { position:absolute; top:2px; right:18px; z-index:10; display:block; height:44px; padding:0 10px; border:0; background:none; color:#d0cec7; font-size:12px; }
+  .folder-exit:focus-visible { outline:2px solid #eeeae3; outline-offset:-3px; }
+}
+@media (max-height:550px) {
+  .folder-stack.has-open { padding-top:46px; padding-bottom:12px; }
+  .folder-stack.has-open .folder-shell,
+  .folder-stack.has-open .folder-shell:last-child:not(.is-open),
+  .folder-stack.has-open .work-folder,
+  .folder-stack.has-open .folder-shell:last-child:not(.is-open) .work-folder { height:32px; }
+  .folder-stack.has-open .is-open .work-folder { height:54px; }
+  .folder-stack.has-open .folder-tab { top:-8px; }
+  .folder-stack.has-open .folder-shell.is-open { height:auto; }
+  .folder-stack.has-open .is-open .folder-cover { height:42px; }
+}
+
+@media (max-width:650px) { .folder-browser:has(.has-open) { top:72px; } }
