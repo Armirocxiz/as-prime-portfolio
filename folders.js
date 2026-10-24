@@ -34,6 +34,7 @@ function clearPanelStyles(panel) {
 }
 
 function cancelFolderAnimations() {
+  collectionStrips.forEach(strip => strip.cancel());
   activeAnimations.forEach(animation => animation.cancel());
   activeAnimations = [];
   folderPanels.forEach(clearPanelStyles);
@@ -43,42 +44,36 @@ function cancelFolderAnimations() {
   });
 }
 
-function panelMetrics(panel) {
-  const style = getComputedStyle(panel);
-  return { height:panel.getBoundingClientRect().height, paddingTop:parseFloat(style.paddingTop), paddingBottom:parseFloat(style.paddingBottom), opacity:parseFloat(style.opacity) };
+function folderPositions() {
+  return new Map(folderButtons.map(button => [button.dataset.collection, button.closest('.folder-shell').getBoundingClientRect()]));
 }
 
-function animatePanel(panel, expanding, from = null) {
-  const metrics = from || panelMetrics(panel);
-  let values = expanding
-    ? { height:[0,metrics.height], paddingTop:[0,metrics.paddingTop], paddingBottom:[0,metrics.paddingBottom], opacity:[0,1] }
-    : { height:[metrics.height,0], paddingTop:[metrics.paddingTop,0], paddingBottom:[metrics.paddingBottom,0], opacity:[metrics.opacity,0] };
-  // In a short viewport the cabinet has a fixed budget; fade within that frame.
-  if (compactFolders.matches) values = {opacity:expanding ? [0,1] : [metrics.opacity,0]};
-  let animation;
-  if (motionAnimate) {
-    const controls = motionAnimate(panel, values, {
-      type:'spring', visualDuration:expanding ? .38 : .26, bounce:0,
-      opacity:{ type:'tween', duration:expanding ? .22 : .16, ease:'easeOut' }
-    });
-    animation = { cancel:() => controls.cancel(), finished:Promise.resolve(controls) };
-  } else {
-    // Folder browsing remains usable if the animation runtime cannot load.
-    const controls = panel.animate([
-      Object.fromEntries(Object.entries(values).map(([key,value]) => [key,key === 'opacity' ? value[0] : `${value[0]}px`])),
-      Object.fromEntries(Object.entries(values).map(([key,value]) => [key,key === 'opacity' ? value[1] : `${value[1]}px`]))
-    ], { duration:expanding ? 420 : 280, easing:'cubic-bezier(.2,.75,.2,1)' });
-    animation = { cancel:() => controls.cancel(), finished:controls.finished };
-  }
-  activeAnimations.push(animation);
-  return animation;
+function unfoldFolders(before, selected) {
+  if (folderMotion.matches) return;
+  folderButtons.forEach(button => {
+    const shell = button.closest('.folder-shell');
+    const from = before.get(button.dataset.collection);
+    const to = shell.getBoundingClientRect();
+    if (!from || !to.width) return;
+    const active = button.dataset.collection === selected;
+    const transform = `translate(${from.left-to.left}px,${from.top-to.top}px) scaleX(${from.width/to.width})`;
+    const start = {transform,transformOrigin:'top left'};
+    const end = {transform:'translate(0,0) scaleX(1)',transformOrigin:'top left'};
+    if (active) {
+      start.clipPath = `inset(-32px -12px ${Math.max(0,to.height-from.height)}px -12px)`;
+      end.clipPath = 'inset(-32px -12px -24px -12px)';
+    }
+    const controls = shell.animate([start,end], {duration:selected ? 520 : 400,easing:'cubic-bezier(.22,1,.36,1)'});
+    activeAnimations.push({cancel:() => controls.cancel()});
+    controls.finished.catch(() => {});
+  });
 }
 
 function revealProjects(panel, version) {
   if (!motionAnimate || folderMotion.matches) return;
   const cards = Array.from(panel.querySelectorAll('.tile:not([hidden]), .photo-card:not([hidden])')).slice(0,9);
   const controls = motionAnimate(cards, { opacity:[0,1], y:[10,0] }, {
-    type:'tween', duration:.26, delay:window.Motion.stagger(.025, {startDelay:.08}), ease:[.2,.7,.2,1]
+    type:'tween', duration:.28, delay:window.Motion.stagger(.025, {startDelay:.16}), ease:[.2,.7,.2,1]
   });
   activeAnimations.push({ cancel:() => controls.cancel() });
   Promise.resolve(controls).then(() => {
@@ -114,16 +109,109 @@ collectionSections.forEach(section => {
   hint.textContent = 'Swipe to explore';
   controls.append(previous,status,hint,next);
   section.append(controls);
+  const startFor = index => Math.min(grid.scrollWidth-grid.clientWidth, Math.max(0,cards[index].offsetLeft-cards[0].offsetLeft));
+  const nearestIndex = () => cards.reduce((closest,card,index) => Math.abs(startFor(index)-grid.scrollLeft) < Math.abs(startFor(closest)-grid.scrollLeft) ? index : closest,0);
+  let frame = 0;
+  let destination = null;
+  let gesture = null;
+  let suppressClick = false;
   const update = () => {
-    const index = Math.max(0, Math.min(cards.length-1, Math.round(grid.scrollLeft / (grid.clientWidth+12))));
+    const index = nearestIndex();
     status.textContent = `${index+1} / ${cards.length}`;
     previous.disabled = index === 0;
     next.disabled = index === cards.length-1;
   };
-  previous.addEventListener('click', () => grid.scrollBy({left:-(grid.clientWidth+12),behavior:folderMotion.matches ? 'instant' : 'smooth'}));
-  next.addEventListener('click', () => grid.scrollBy({left:grid.clientWidth+12,behavior:folderMotion.matches ? 'instant' : 'smooth'}));
+  const stop = () => {
+    cancelAnimationFrame(frame);
+    frame = 0;
+    destination = null;
+    grid.classList.remove('is-dragging','is-settling');
+  };
+  const goTo = index => {
+    stop();
+    const target = Math.max(0,Math.min(cards.length-1,index));
+    const from = grid.scrollLeft;
+    const to = startFor(target);
+    if (folderMotion.matches || Math.abs(to-from) < 1) {
+      grid.scrollLeft = to;
+      update();
+      return;
+    }
+    destination = target;
+    grid.classList.add('is-settling');
+    const started = performance.now();
+    const duration = Math.min(260,160+Math.abs(to-from)*.25);
+    const tick = now => {
+      const progress = Math.min(1,(now-started)/duration);
+      grid.scrollLeft = from+(to-from)*(1-Math.pow(1-progress,3));
+      if (progress < 1) frame = requestAnimationFrame(tick);
+      else { stop(); grid.scrollLeft = to; update(); }
+    };
+    frame = requestAnimationFrame(tick);
+  };
+  previous.addEventListener('click', () => goTo((destination ?? nearestIndex())-1));
+  next.addEventListener('click', () => goTo((destination ?? nearestIndex())+1));
   grid.addEventListener('scroll',update,{passive:true});
-  collectionStrips.push({section,grid,cards,update});
+  grid.addEventListener('pointerdown', event => {
+    if (!compactFolders.matches || (event.pointerType === 'mouse' && event.button !== 0)) return;
+    stop();
+    suppressClick = false;
+    gesture = {id:event.pointerId,x:event.clientX,y:event.clientY,lastX:event.clientX,lastTime:performance.now(),velocity:0,start:grid.scrollLeft,index:nearestIndex(),dragged:false};
+  }, {passive:true});
+  grid.addEventListener('pointermove', event => {
+    if (!gesture || event.pointerId !== gesture.id) return;
+    const dx = event.clientX-gesture.x;
+    const dy = event.clientY-gesture.y;
+    if (!gesture.dragged) {
+      if (Math.abs(dy) > 8 && Math.abs(dy) > Math.abs(dx)) { gesture = null; return; }
+      if (Math.abs(dx) < 6 || Math.abs(dx) < Math.abs(dy)*1.15) return;
+      gesture.dragged = true;
+      grid.classList.add('is-dragging');
+      try { grid.setPointerCapture(event.pointerId); } catch (_) { /* Synthetic QA events have no active browser pointer. */ }
+    }
+    event.preventDefault();
+    const now = performance.now();
+    gesture.velocity = (event.clientX-gesture.lastX)/Math.max(1,now-gesture.lastTime);
+    gesture.lastX = event.clientX;
+    gesture.lastTime = now;
+    grid.scrollLeft = gesture.start-dx;
+  }, {passive:false});
+  const release = event => {
+    if (!gesture || event.pointerId !== gesture.id) return;
+    const ended = gesture;
+    gesture = null;
+    if (!ended.dragged) return;
+    suppressClick = true;
+    const distance = ended.x-event.clientX;
+    const velocity = performance.now()-ended.lastTime < 100 ? -ended.velocity : 0;
+    const advance = event.type !== 'pointercancel' && (Math.abs(distance) >= 24 || (Math.abs(distance) >= 8 && Math.abs(velocity) > .22));
+    const direction = Math.sign(distance || velocity);
+    goTo(advance ? ended.index+direction : ended.index);
+  };
+  grid.addEventListener('pointerup',release);
+  grid.addEventListener('pointercancel',release);
+  grid.addEventListener('lostpointercapture', event => {
+    if (!gesture || !gesture.dragged || gesture.id !== event.pointerId) return;
+    const index = gesture.index;
+    gesture = null;
+    suppressClick = true;
+    goTo(index);
+  });
+  grid.addEventListener('click', event => {
+    if (!suppressClick || event.detail === 0) return;
+    event.preventDefault();
+    event.stopImmediatePropagation();
+    suppressClick = false;
+  }, true);
+  grid.addEventListener('dragstart', event => { if (compactFolders.matches) event.preventDefault(); });
+  grid.addEventListener('keydown', event => {
+    if (!compactFolders.matches || !['ArrowLeft','ArrowRight'].includes(event.key)) return;
+    event.preventDefault();
+    const index = Math.max(0,Math.min(cards.length-1,(destination ?? nearestIndex())+(event.key === 'ArrowRight' ? 1 : -1)));
+    goTo(index);
+    cards[index].focus({preventScroll:true});
+  });
+  collectionStrips.push({section,grid,cards,update,cancel:() => { gesture = null; stop(); }});
   update();
 });
 function syncCompactFolders() {
@@ -203,6 +291,7 @@ function resetFolders() {
 }
 
 function showCollection(id, { scroll = false, focus = true, updateUrl = true } = {}) {
+  const before = folderPositions();
   const target = collectionSections.find(section => section.id === id);
   if (!target && id !== 'all') return;
   const sourceButton = folderButtons.find(button => button.dataset.collection === id);
@@ -225,14 +314,6 @@ function showCollection(id, { scroll = false, focus = true, updateUrl = true } =
     button.closest('.folder-shell').classList.add('is-open');
     button.setAttribute('aria-expanded', 'true');
     if (focus) button.focus({ preventScroll:true });
-    if (!folderMotion.matches) {
-      const version = transitionVersion;
-      const animation = animatePanel(panel, true);
-      revealProjects(panel, version);
-      animation.finished.then(() => {
-        if (version === transitionVersion && openFolder === id) clearPanelStyles(panel);
-      }).catch(() => {});
-    }
   }
   collectionToggle.textContent = id === 'all' ? 'Close film archive ↑' : 'View all 22 films ↗';
   collectionToggle.setAttribute('aria-expanded', String(id === 'all'));
@@ -246,14 +327,23 @@ function showCollection(id, { scroll = false, focus = true, updateUrl = true } =
     const anchor = id === 'all' ? collectionTools : folderPanels.get(id).closest('.folder-shell');
     anchor.scrollIntoView({ behavior:folderMotion.matches ? 'auto' : 'smooth', block:'start' });
   }
+  if (id !== 'all' && !folderMotion.matches) {
+    const panel = folderPanels.get(id);
+    unfoldFolders(before,id);
+    const controls = panel.animate([{opacity:0},{opacity:1}],{duration:280,delay:120,fill:'backwards',easing:'ease-out'});
+    activeAnimations.push({cancel:() => controls.cancel()});
+    controls.finished.catch(() => {});
+    revealProjects(panel,transitionVersion);
+  }
 }
 
 function closeCollection({ scroll = false, focus = true, updateUrl = true, animate = true } = {}) {
+  const before = folderPositions();
   const previousId = openFolder || closingFolder;
   const previous = folderButtons.find(button => button.dataset.collection === previousId);
   const sourceTop = previous?.getBoundingClientRect().top;
   const panel = folderPanels.get(previousId);
-  const from = panel && !panel.hidden ? panelMetrics(panel) : null;
+  const from = panel && !panel.hidden ? panel.getBoundingClientRect() : null;
   transitionVersion += 1;
   const version = transitionVersion;
   cancelFolderAnimations();
@@ -275,11 +365,17 @@ function closeCollection({ scroll = false, focus = true, updateUrl = true, anima
       previous.scrollIntoView({ behavior:'instant', block:'center' });
     }
     if (scroll) document.getElementById('work').scrollIntoView({ behavior:folderMotion.matches ? 'auto' : 'smooth', block:'start' });
+    if (from && animate && !scroll) unfoldFolders(before,null);
   };
   if (from && animate && !scroll && !folderMotion.matches) {
     closingFolder = previousId;
     finishPendingClose = finish;
-    animatePanel(panel, false, from).finished.then(finish).catch(() => {});
+    const shell = panel.closest('.folder-shell');
+    const clip = Math.max(0,shell.getBoundingClientRect().height-(compactFolders.matches ? 64 : 90));
+    const fold = shell.animate([{clipPath:'inset(-32px -12px -24px -12px)'},{clipPath:`inset(-32px -12px ${clip}px -12px)`}],{duration:260,easing:'cubic-bezier(.4,0,.8,1)',fill:'forwards'});
+    const fade = panel.animate([{opacity:1},{opacity:0}],{duration:180,fill:'forwards'});
+    activeAnimations.push({cancel:() => fold.cancel()},{cancel:() => fade.cancel()});
+    fold.finished.then(finish).catch(() => {});
   } else finish();
 }
 

@@ -23,3 +23,11 @@ A quick tap opens a collection. A 320 ms touch/pen hold previews its prints and 
 ## Short viewports
 
 At widths up to 650 px or heights up to 700 px, an open cabinet occupies a fixed viewer below the sticky header, with a Back to portfolio control. The underlying page retains its position, is inert, and does not scroll until the cabinet closes. All five tabs remain visible. The selected folder contains a horizontal snap strip with every item, previous/next 44 px controls and an item count. Portrait media uses contain instead of cropping. Photo strips expose all 19/12 photos; normal desktop gallery limits are restored on resize. The rest of the portfolio remains a regular vertically scrolling page.
+
+## Direct swipe handling
+
+Compact strips follow horizontal pointer movement directly. A 24 px drag or a short, quick flick advances one item; smaller movements settle back in 160–260 ms. Horizontal intent locks after 6 px, pointer capture keeps the drag continuous, and the drag’s click is consumed before a video/photo viewer can open. A new tap clears that guard immediately. Vertical movement remains native; cancellation returns to the starting item. Arrows use the same measured card positions, rapid input replaces prior settling, keyboard arrows work, and reduced motion snaps instantly. A 24 px edge of the next card makes swiping discoverable.
+
+## Continuous opening
+
+Before opening, capture every folder’s viewport position. After the expanded layout settles, animate each shell from that position over 520 ms, with the selected frame revealing its full height through a clip. The media fades in after the cover starts moving. This makes the surrounding folders travel with the expansion instead of instantly turning into rows; no image is stretched vertically. Reduced motion skips the transition, and changing intent cancels it.
