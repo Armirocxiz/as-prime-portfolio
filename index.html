@@ -11,45 +11,21 @@
 <link rel="stylesheet" href="reveal.css">
 <link rel="stylesheet" href="styles.css">
 <link rel="stylesheet" href="folders.css">
+<link rel="stylesheet" href="compact.css">
 </head>
 <body>
 <header>
-<a class="logo" href="#" aria-label="AS PRIME home"><img src="assets/as-prime-sharp.svg" width="612" height="408" alt="AS PRIME"></a>
-<nav>
-<a href="#work">WORK</a>
-<a href="#reels">REELS</a>
-<a href="#photography">PHOTOGRAPHY</a>
-<a href="#contact">CONTACT</a>
-</nav>
+<a class="logo brand-reveal" id="logo-reveal" href="#work" aria-label="AS PRIME home">
+  <span class="logo-lockup">
+    <img class="actual-logo" src="assets/as-prime-sharp.svg" width="612" height="408" fetchpriority="high" alt="AS PRIME">
+    <span class="logo-window" aria-hidden="true"><span class="logo-scenes"></span><img class="projection-preload" src="assets/as-prime-projection.webp" width="3840" height="1920" decoding="async" alt=""></span>
+  </span>
+</a>
+<nav aria-label="Main navigation"><a href="#work">WORK</a><a href="#contact">CONTACT</a></nav>
 </header>
-<section class="hero cinematic-hero" aria-label="AS Prime cinematic logo reveal">
-  <div class="hero-content">
-    <h1 class="sr-only">AS PRIME — End-to-end content production</h1>
-    <div class="reveal-stage" id="logo-reveal">
-      <div class="logo-lockup">
-        <img class="actual-logo" src="assets/as-prime-sharp.svg" width="612" height="408" fetchpriority="high" alt="AS PRIME">
-        <span class="logo-window" aria-hidden="true">
-<span class="logo-scenes"></span>
-<img class="projection-preload" src="assets/as-prime-projection.webp" width="3840" height="1920" decoding="async" alt="">
-</span>
-      </div>
-      <div class="hero-flare" aria-hidden="true">
-</div>
-      <div class="reveal-line" aria-hidden="true">
-</div>
-    </div>
-    <button class="reveal-replay" id="replay-reveal" type="button" aria-label="Replay AS PRIME logo reveal" hidden>
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
-<path d="M4 10a8 8 0 1 1 1 7M4 4v6h6"/>
-</svg>Replay reveal
-    </button>
-
-  </div>
-</section>
 <main>
 <section class="portfolio-section" id="work" aria-labelledby="work-title">
-<div class="collection-heading"><div><div class="eyebrow">End-to-end content production</div><h2 id="work-title">Selected work<span>.</span></h2></div><button class="collection-toggle" id="collection-toggle" type="button" aria-expanded="false" aria-controls="catalog" hidden>View all 22 films ↗</button></div>
-<p class="production-intro">From concept to final delivery. Film, photography and digital creation.</p>
+<div class="collection-heading"><div><div class="eyebrow">Content production / UAE</div><h1 id="work-title">Portfolio<span>.</span></h1></div><button class="collection-toggle" id="collection-toggle" type="button" aria-expanded="false" aria-controls="catalog" hidden>View all 22 films ↗</button></div>
 <p class="collection-status" id="collection-status" role="status" aria-live="polite">22 films</p>
 <div class="folder-browser" id="folder-browser" hidden>
 <div class="folder-stack" role="group" aria-label="Portfolio folders">
@@ -155,9 +131,7 @@
 </section>
 <section class="section contact-section" id="contact" aria-labelledby="contact-title">
 <h2 id="contact-title">Get in touch<span>.</span></h2>
-<p>UAE / Bookings &amp; collaborations</p>
 <div class="contact-actions"><a class="button" href="https://wa.me/971501134339">WHATSAPP <span aria-hidden="true">↗</span></a><a class="button button-outline" href="mailto:ar.irshad11@gmail.com">EMAIL <span aria-hidden="true">↗</span></a></div>
-<div class="contact-details"><a href="tel:+971501134339">+971 50 113 4339</a><a href="mailto:ar.irshad11@gmail.com">ar.irshad11@gmail.com</a></div>
 </section></main>
 <footer><span>AS PRIME <span class="footer-separator">/</span> END-TO-END CONTENT PRODUCTION</span><a href="https://as-prime.com">AS-PRIME.COM ↗</a><a href="#">BACK TO TOP ↑</a></footer>
 <dialog id="modal" aria-labelledby="title" aria-describedby="details">

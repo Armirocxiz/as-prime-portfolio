@@ -1,0 +1,41 @@
+/* Compact portfolio variant: brand, work, contact. */
+header { min-height:88px; padding-block:12px; }
+.brand-reveal { width:112px; height:60px; overflow:hidden; }
+.brand-reveal .logo-lockup { position:absolute; width:150px; max-width:none; left:-19px; top:-18px; margin:0; }
+.brand-reveal .actual-logo { position:relative; width:100%; height:auto; inset:auto; filter:none; }
+.brand-reveal .logo-window { inset:0; }
+.brand-reveal .projection-preload { display:none; }
+.brand-reveal .logo-scenes { filter:none; }
+.brand-reveal.is-playing .logo-lockup,
+.brand-reveal.is-playing .actual-logo { animation:none; }
+header nav { gap:28px; }
+header nav a { min-height:44px; display:flex; align-items:center; }
+main { padding-top:24px; }
+.collection-heading { align-items:center; margin:0 0 8px; }
+.collection-heading h1 { margin:5px 0 0; font-size:clamp(28px,3vw,38px); line-height:1.1; font-weight:500; letter-spacing:-.035em; }
+.collection-heading .eyebrow { font-size:10px; }
+.collection-status { margin:0; font-size:12px; }
+.folder-browser { margin:40px auto 40px; }
+.folder-stack:not(.has-open) .work-folder:is(:focus-visible,.is-previewing) .folder-back { transform:translateY(-60px); }
+.contact-section { padding-block:24px 30px; }
+.contact-section h2 { margin:0 0 18px; font-size:28px; }
+footer { padding-block:20px; }
+@media (max-width:650px) {
+  header { min-height:76px; padding-block:8px; }
+  .brand-reveal { width:100px; height:54px; }
+  .brand-reveal .logo-lockup { width:134px; left:-17px; top:-16px; }
+  .brand-reveal .actual-logo { width:100%; height:auto; inset:auto; }
+  header nav { gap:20px; }
+  header nav a { font-size:10px; }
+  main { padding-top:20px; }
+  .collection-heading h1 { font-size:27px; }
+  .collection-heading .eyebrow { max-width:none; font-size:9px; }
+  .collection-status { font-size:11px; }
+  .collection-toggle { max-width:none; font-size:10px; padding:10px 12px; }
+  .folder-browser { margin:48px auto 30px; }
+  .contact-section { padding-block:22px 26px; }
+  .contact-section h2 { font-size:24px; }
+}
+@media (prefers-reduced-motion:reduce) {
+  .brand-reveal .logo-window { display:none; }
+}

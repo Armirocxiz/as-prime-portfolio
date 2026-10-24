@@ -185,20 +185,14 @@ document.querySelectorAll('.tile').forEach(tile => {
   });
 });
 
+// The original logo montage now plays once in the compact header mark.
 const stage = document.getElementById('logo-reveal');
-const replay = document.getElementById('replay-reveal');
 const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
-function playReveal() {
-  stage.classList.remove('is-playing');
-  if (reducedMotion.matches) return;
-  // Flush the finished sequence so replay starts from the first frame.
-  void stage.offsetWidth;
-  stage.classList.add('is-playing');
+if (stage) {
+  Promise.allSettled(Array.from(stage.querySelectorAll('img'),img => img.decode())).then(() => {
+    if (!reducedMotion.matches) stage.classList.add('is-playing');
+  });
+  reducedMotion.addEventListener('change', () => {
+    if (reducedMotion.matches) stage.classList.remove('is-playing');
+  });
 }
-replay.hidden = false;
-replay.addEventListener('click', playReveal);
-reducedMotion.addEventListener('change', () => {
-  if (reducedMotion.matches) stage.classList.remove('is-playing');
-});
-// Decode local imagery first. With JavaScript disabled, the original logo remains visible.
-Promise.allSettled(Array.from(stage.querySelectorAll('img'), img => img.decode())).then(playReveal);
