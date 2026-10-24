@@ -39,3 +39,7 @@ footer { padding-block:20px; }
 @media (prefers-reduced-motion:reduce) {
   .brand-reveal .logo-window { display:none; }
 }
+
+/* Brand labels stay visible above the supplied editorial project titles. */
+.tile .project-brand { display:block; margin-top:10px; color:var(--muted); font-size:12px; line-height:1.4; letter-spacing:.01em; }
+.tile .project-brand + h4 { margin-top:5px; }

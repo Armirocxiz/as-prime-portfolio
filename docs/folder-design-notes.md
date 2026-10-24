@@ -14,7 +14,7 @@ PC shows the full collection grid inside the expanded folder. At widths up to 65
 
 ## Touch and keyboard
 
-Tap opens. A 320 ms touch/pen hold previews the prints; moving more than 12 px cancels it so vertical page scrolling remains native. Horizontal strips follow the finger after 6 px of horizontal intent. A 24 px drag or quick flick advances one item, smaller gestures settle back, and a drag cannot accidentally open the player. New taps remain immediate. Arrows use measured item positions; keyboard arrows move focus to the visible card. Reduced motion settles instantly. The next card peeks into view to signal swiping.
+Tap opens. A 320 ms touch/pen hold previews the prints; moving more than 12 px cancels it so vertical page scrolling remains native. On touch/pen devices, horizontal strips use native browser scrolling, momentum and CSS scroll snap, with touch-action:auto so diagonal thumb gestures can resolve correctly. Custom pointer capture, preventDefault and release snapping apply only to mouse dragging. A touch pointer cancellation does not reset the strip to its starting item. Native scrolling cancels the media click when a finger pans; mouse drags keep their explicit click guard. Arrows and keyboard navigation retain the measured positions and reduced-motion behavior. The next card peeks into view to signal swiping.
 
 ## Tools and guidance
 

@@ -153,7 +153,16 @@ collectionSections.forEach(section => {
   next.addEventListener('click', () => goTo((destination ?? nearestIndex())+1));
   grid.addEventListener('scroll',update,{passive:true});
   grid.addEventListener('pointerdown', event => {
-    if (!compactFolders.matches || (event.pointerType === 'mouse' && event.button !== 0)) return;
+    if (!compactFolders.matches) return;
+    // Touch/pen scrolling and momentum belong to the browser. A pointer cancellation
+    // during native panning must never trigger the custom mouse snap-back path.
+    if (event.pointerType !== 'mouse') {
+      stop();
+      gesture = null;
+      suppressClick = false;
+      return;
+    }
+    if (event.button !== 0) return;
     stop();
     suppressClick = false;
     gesture = {id:event.pointerId,x:event.clientX,y:event.clientY,lastX:event.clientX,lastTime:performance.now(),velocity:0,start:grid.scrollLeft,index:nearestIndex(),dragged:false};

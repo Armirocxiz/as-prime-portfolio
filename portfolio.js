@@ -8,46 +8,53 @@ const projects = [
     "description": "An AI-led explainer film."
   },
   {
-    "title": "Emper",
+    "title": "Exhibition day, cut into a film with a point of view",
     "category": "Highlights",
     "video": "https://youtu.be/_dcuEn4TNiM",
-    "description": "Exhibition highlights for Emper."
+    "description": "Exhibition day, cut into a film with a point of view",
+    "brand": "Emper"
   },
   {
-    "title": "Alpha Arts",
+    "title": "Exhibition moments that show the craft at its best",
     "category": "Highlights",
     "video": "https://youtu.be/Pr6DJHmH-zw",
-    "description": "Exhibition highlights for Alpha Arts."
+    "description": "Exhibition moments that show the craft at its best",
+    "brand": "Alpha Arts"
   },
   {
-    "title": "I-Remedies",
+    "title": "Exhibition coverage that builds trust in a wellness brand",
     "category": "Highlights",
     "video": "https://youtu.be/qHdpoM1qa58",
-    "description": "Exhibition highlights for I-Remedies."
+    "description": "Exhibition coverage that builds trust in a wellness brand",
+    "brand": "I-Remedies"
   },
   {
-    "title": "Kenz de Rasasi",
+    "title": "Fragrance exhibition, covered from the stand to the crowd",
     "category": "Highlights",
     "video": "https://youtu.be/CykQ7cmosV8",
-    "description": "Fragrance, people and exhibition moments."
+    "description": "Fragrance exhibition, covered from the stand to the crowd",
+    "brand": "Kenz de Rasasi"
   },
   {
-    "title": "Al Masaood",
+    "title": "Your exhibition stand, turned into a story",
     "category": "Highlights",
     "video": "https://youtu.be/FvZH7Wg7Y-U",
-    "description": "The exhibition stand, team and visitors."
+    "description": "Your exhibition stand, turned into a story",
+    "brand": "Al Masaood"
   },
   {
-    "title": "CombiLift",
+    "title": "Corporate dinner, captured as a night worth remembering",
     "category": "Highlights",
     "video": "https://youtu.be/Mecq3Hjvk2w",
-    "description": "Exhibition highlights for CombiLift."
+    "description": "Corporate dinner, captured as a night worth remembering",
+    "brand": "CombiLift"
   },
   {
-    "title": "Vivienne Sabo",
+    "title": "Product launch, filmed so the reveal lands again online",
     "category": "Highlights",
     "video": "https://youtu.be/UdkRDUl_-9c",
-    "description": "Exhibition highlights for Vivienne Sabo."
+    "description": "Product launch, filmed so the reveal lands again online",
+    "brand": "Vivienne Sabo"
   },
   {
     "title": "Fragrance study",
@@ -104,16 +111,18 @@ const projects = [
     "description": "A clinic reel, made for social."
   },
   {
-    "title": "Nicoli",
+    "title": "Store launch, captured so the doors open to a crowd",
     "category": "Highlights",
     "video": "https://youtu.be/ZsnbpzU47ZI",
-    "description": "Fashion and accessories in focus."
+    "description": "Store launch, captured so the doors open to a crowd",
+    "brand": "Nicoli"
   },
   {
-    "title": "National Feed",
+    "title": "Exhibition coverage that makes an industrial brand watchable",
     "category": "Highlights",
     "video": "https://youtu.be/-pUvmMgj9eM",
-    "description": "Exhibition highlights for National Feed."
+    "description": "Exhibition coverage that makes an industrial brand watchable",
+    "brand": "National Feed"
   },
   {
     "title": "Fashion portrait",
@@ -144,7 +153,8 @@ function openProject(index) {
   const id = project.video.match(/(?:youtu\.be\/|youtube\.com\/shorts\/)([\w-]{11})(?:[?&#].*)?$/)?.[1];
   if (!id) return;
 
-  document.getElementById('title').textContent = project.title;
+  const displayTitle = project.brand ? `${project.brand}: ${project.title}` : project.title;
+  document.getElementById('title').textContent = displayTitle;
   const category = document.createElement('span');
   category.textContent = project.category;
   const youtubeLink = document.createElement('a');
@@ -155,10 +165,10 @@ function openProject(index) {
   const description = document.createElement('p');
   description.className = 'project-description';
   description.textContent = project.description;
-  document.getElementById('details').replaceChildren(category, youtubeLink, description);
+  document.getElementById('details').replaceChildren(category,youtubeLink,...(project.description !== project.title ? [description] : []));
 
   const iframe = document.createElement('iframe');
-  iframe.title = project.title;
+  iframe.title = displayTitle;
   iframe.src = `https://www.youtube-nocookie.com/embed/${id}?autoplay=1&rel=0`;
   iframe.allow = 'autoplay; encrypted-media; fullscreen; picture-in-picture';
   iframe.allowFullscreen = true;

@@ -190,7 +190,7 @@ body.folders-ready { overflow-anchor:none; }
 /* A small next-card edge signals the horizontal strip before the first swipe. */
 @media (max-width:650px), (max-height:700px) {
   body.folders-ready .folder-content .project-grid,
-  body.folders-ready .folder-content .photo-grid { position:relative; touch-action:pan-y pinch-zoom; scroll-behavior:auto; user-select:none; cursor:grab; }
+  body.folders-ready .folder-content .photo-grid { position:relative; touch-action:auto; -webkit-overflow-scrolling:touch; scroll-behavior:auto; user-select:none; cursor:grab; }
   body.folders-ready .folder-content .tile,
   .folder-content .photo-card { flex-basis:calc(100% - 36px); }
   .folder-content .project-grid::after,
