@@ -22,12 +22,6 @@ let activeAnimations = [];
 let transitionVersion = 0;
 let closingFolder = null;
 let finishPendingClose = null;
-const folderExit = document.createElement('button');
-folderExit.type = 'button';
-folderExit.className = 'folder-exit';
-folderExit.textContent = 'Back to portfolio ×';
-folderExit.addEventListener('click', () => closeCollection({scroll:true}));
-folderBrowser.prepend(folderExit);
 
 function clearPanelStyles(panel) {
   ['height', 'padding-top', 'padding-bottom', 'opacity'].forEach(property => panel.style.removeProperty(property));
@@ -55,18 +49,32 @@ function unfoldFolders(before, selected) {
     const from = before.get(button.dataset.collection);
     const to = shell.getBoundingClientRect();
     if (!from || !to.width) return;
-    const active = button.dataset.collection === selected;
     const transform = `translate(${from.left-to.left}px,${from.top-to.top}px) scaleX(${from.width/to.width})`;
     const start = {transform,transformOrigin:'top left'};
     const end = {transform:'translate(0,0) scaleX(1)',transformOrigin:'top left'};
-    if (active) {
-      start.clipPath = `inset(-32px -12px ${Math.max(0,to.height-from.height)}px -12px)`;
-      end.clipPath = 'inset(-32px -12px -24px -12px)';
-    }
     const controls = shell.animate([start,end], {duration:selected ? 520 : 400,easing:'cubic-bezier(.22,1,.36,1)'});
     activeAnimations.push({cancel:() => controls.cancel()});
     controls.finished.catch(() => {});
   });
+}
+
+function animateFolderHeight(panel, expanding, version, onPrepared = () => {}, onFinished = () => {}) {
+  const style = getComputedStyle(panel);
+  const natural = {height:panel.getBoundingClientRect().height,paddingTop:parseFloat(style.paddingTop),paddingBottom:parseFloat(style.paddingBottom),opacity:parseFloat(style.opacity)};
+  const closed = {height:0,paddingTop:0,paddingBottom:0,opacity:0};
+  const first = expanding ? closed : natural;
+  const last = expanding ? natural : closed;
+  const frame = metrics => ({height:`${metrics.height}px`,paddingTop:`${metrics.paddingTop}px`,paddingBottom:`${metrics.paddingBottom}px`,opacity:metrics.opacity});
+  Object.assign(panel.style,frame(first));
+  onPrepared();
+  const controls = panel.animate([frame(first),frame(last)], {duration:expanding ? 520 : 360,easing:'cubic-bezier(.22,1,.36,1)',fill:'forwards'});
+  activeAnimations.push({cancel:() => controls.cancel()});
+  controls.finished.then(() => {
+    if (version !== transitionVersion) return;
+    clearPanelStyles(panel);
+    controls.cancel();
+    onFinished();
+  }).catch(() => {});
 }
 
 function revealProjects(panel, version) {
@@ -84,11 +92,6 @@ function revealProjects(panel, version) {
 
 // Every item stays accessible in a single-height, touch-scrollable film strip.
 const collectionStrips = [];
-const obscuredContent = Array.from(document.querySelectorAll('main > section:not(#work), #work > :not(#folder-browser), footer'));
-function syncCabinetFocus() {
-  const active = compactFolders.matches && folderStack.classList.contains('has-open');
-  obscuredContent.forEach(element => { element.inert = active; });
-}
 collectionSections.forEach(section => {
   const grid = section.querySelector('.project-grid, .photo-grid');
   const cards = Array.from(grid.children);
@@ -215,7 +218,6 @@ collectionSections.forEach(section => {
   update();
 });
 function syncCompactFolders() {
-  syncCabinetFocus();
   collectionStrips.forEach(({section,cards,update}) => {
     if (section.matches('[data-photo-gallery]')) {
       const expanded = section.querySelector('.gallery-toggle').getAttribute('aria-expanded') === 'true';
@@ -285,7 +287,6 @@ function resetFolders() {
     button.setAttribute('aria-expanded', 'false');
   });
   folderStack.classList.remove('has-open');
-  syncCabinetFocus();
   document.getElementById('catalog').hidden = true;
   collectionTools.hidden = true;
 }
@@ -310,35 +311,28 @@ function showCollection(id, { scroll = false, focus = true, updateUrl = true } =
     target.hidden = false;
     panel.hidden = false;
     folderStack.classList.add('has-open');
-    syncCabinetFocus();
-    button.closest('.folder-shell').classList.add('is-open');
+      button.closest('.folder-shell').classList.add('is-open');
     button.setAttribute('aria-expanded', 'true');
     if (focus) button.focus({ preventScroll:true });
   }
   collectionToggle.textContent = id === 'all' ? 'Close film archive ↑' : 'View all 22 films ↗';
   collectionToggle.setAttribute('aria-expanded', String(id === 'all'));
   if (updateUrl) history.replaceState(null, '', id === 'all' ? '#all-films' : `#${id}`);
-  if (!compactFolders.matches && !scroll && sourceButton && sourceTop >= 83) {
+  if (!scroll && sourceButton && sourceTop >= 83) {
     window.scrollBy({ top:sourceButton.getBoundingClientRect().top - sourceTop, behavior:'instant' });
   }
-  if (compactFolders.matches && id !== 'all') {
-    // The touch cabinet is an in-screen viewer; retain the page's scroll position.
-  } else if (scroll) {
+  if (scroll) {
     const anchor = id === 'all' ? collectionTools : folderPanels.get(id).closest('.folder-shell');
     anchor.scrollIntoView({ behavior:folderMotion.matches ? 'auto' : 'smooth', block:'start' });
   }
   if (id !== 'all' && !folderMotion.matches) {
     const panel = folderPanels.get(id);
-    unfoldFolders(before,id);
-    const controls = panel.animate([{opacity:0},{opacity:1}],{duration:280,delay:120,fill:'backwards',easing:'ease-out'});
-    activeAnimations.push({cancel:() => controls.cancel()});
-    controls.finished.catch(() => {});
+    animateFolderHeight(panel,true,transitionVersion,() => unfoldFolders(before,id));
     revealProjects(panel,transitionVersion);
   }
 }
 
 function closeCollection({ scroll = false, focus = true, updateUrl = true, animate = true } = {}) {
-  const before = folderPositions();
   const previousId = openFolder || closingFolder;
   const previous = folderButtons.find(button => button.dataset.collection === previousId);
   const sourceTop = previous?.getBoundingClientRect().top;
@@ -356,12 +350,13 @@ function closeCollection({ scroll = false, focus = true, updateUrl = true, anima
   if (updateUrl) history.replaceState(null, '', '#work');
   const finish = () => {
     if (version !== transitionVersion) return;
+    const before = folderPositions();
     resetFolders();
     if (focus) (previous || folderButtons[0]).focus({ preventScroll:true });
     else folderButtons[0].classList.add('is-previewing');
-    if (!compactFolders.matches && !scroll && previous && sourceTop >= 83) {
+    if (!scroll && previous && sourceTop >= 83) {
       window.scrollBy({ top:previous.getBoundingClientRect().top - sourceTop, behavior:'instant' });
-    } else if (!compactFolders.matches && !scroll && focus && previous && sourceTop < 83) {
+    } else if (!scroll && focus && previous && sourceTop < 83) {
       previous.scrollIntoView({ behavior:'instant', block:'center' });
     }
     if (scroll) document.getElementById('work').scrollIntoView({ behavior:folderMotion.matches ? 'auto' : 'smooth', block:'start' });
@@ -370,12 +365,7 @@ function closeCollection({ scroll = false, focus = true, updateUrl = true, anima
   if (from && animate && !scroll && !folderMotion.matches) {
     closingFolder = previousId;
     finishPendingClose = finish;
-    const shell = panel.closest('.folder-shell');
-    const clip = Math.max(0,shell.getBoundingClientRect().height-(compactFolders.matches ? 64 : 90));
-    const fold = shell.animate([{clipPath:'inset(-32px -12px -24px -12px)'},{clipPath:`inset(-32px -12px ${clip}px -12px)`}],{duration:260,easing:'cubic-bezier(.4,0,.8,1)',fill:'forwards'});
-    const fade = panel.animate([{opacity:1},{opacity:0}],{duration:180,fill:'forwards'});
-    activeAnimations.push({cancel:() => fold.cancel()},{cancel:() => fade.cancel()});
-    fold.finished.then(finish).catch(() => {});
+    animateFolderHeight(panel,false,version,undefined,finish);
   } else finish();
 }
 

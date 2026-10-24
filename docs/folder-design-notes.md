@@ -1,33 +1,23 @@
-# Folder interaction references
+# Folder interaction
 
-The folder experiment lives only on `portfolio-copy-2026-10-24`. The original portfolio and logo reveal are preserved.
+The experiment lives only on `portfolio-copy-2026-10-24`. The original portfolio, AS PRIME reveal and all media are preserved.
 
-## Applied tools
+## In-page expansion
 
-- **Motion 14.6.0**: locally served browser runtime for bounded folder opening/closing and a short stagger of project previews. Native animation remains a fallback. The runtime license and provenance are in `assets/vendor`.
-- **UI/UX Pro Max**: published guidance at https://github.com/nextlevelbuilder/ui-ux-pro-max-skill. Ran its local UX search for `rapid accordion animation interrupted`; the relevant result was “Cancellable State Transitions.” State and ARIA update immediately, old motion is cancelled on new intent, and inline styles are cleared. Reduced-motion preferences bypass animation. Folder headers remain large tap targets and metadata is at least 12 px.
-- **21st.dev**: accordion collection at https://21st.dev/community/components/s/accordion. Applied the single-open accordion pattern, labelled regions, a plus/minus indicator, explicit expanded state, visible keyboard focus, and independent interactive content inside each panel. This is a native HTML adaptation, not an installed React component or a connected 21st plugin.
+Every folder remains in normal document flow on PC and mobile. Opening animates the actual panel height and padding from zero to the measured natural size over 520 ms. Later folders, the cabinet caption, contact section and footer are pushed downward by the same layout animation. Closing reverses it over 360 ms. A short transform transition reconciles the stacked cabinet positions; media entry fades/staggers after opening starts. There is no fixed full-screen viewer, page scroll lock or obscured-content inert state.
 
-## Boundaries
+Rapid input cancels prior animations and clears owned inline styles. Semantic expanded state changes immediately. Reduced motion opens/closes directly. Once opening finishes, height is automatic so galleries can resize naturally.
 
-The only layout animation is the height of one folder panel, because its contents must push the remaining folders down. Project entry uses transform/opacity. All original video URLs, photo galleries, keyboard controls, and reduced-motion behavior remain available. No paid services or account credentials are needed.
+## Responsive layouts
 
-## Folder continuity
+PC shows the full collection grid inside the expanded folder. At widths up to 650 px or heights up to 700 px, the folder grows to contain a 230–360 px touch strip, navigation controls and every media item. Later folders move below it and the page scrolls normally. The compact strip retains all 19 fashion and 12 food photos, while desktop restores its original gallery view-more behavior.
 
-Opening retains the cabinet width, raised tabs, individual folder tones and overlapping covers. Only the selected folder grows to contain its original media. Other folders remain layered above and below it; the interaction does not replace the cabinet with flat accordion rows. Collapsed buttons have bounded hit areas so neighboring tabs remain usable.
+## Touch and keyboard
 
-## Touch
+Tap opens. A 320 ms touch/pen hold previews the prints; moving more than 12 px cancels it so vertical page scrolling remains native. Horizontal strips follow the finger after 6 px of horizontal intent. A 24 px drag or quick flick advances one item, smaller gestures settle back, and a drag cannot accidentally open the player. New taps remain immediate. Arrows use measured item positions; keyboard arrows move focus to the visible card. Reduced motion settles instantly. The next card peeks into view to signal swiping.
 
-A quick tap opens a collection. A 320 ms touch/pen hold previews its prints and consumes that gesture’s click. Moving more than 12 px or a native pointer cancellation clears the hold; vertical scrolling and pinch zoom stay native. Keyboard activation remains immediate. The touch hint explains both actions.
+## Tools and guidance
 
-## Short viewports
-
-At widths up to 650 px or heights up to 700 px, an open cabinet occupies a fixed viewer below the sticky header, with a Back to portfolio control. The underlying page retains its position, is inert, and does not scroll until the cabinet closes. All five tabs remain visible. The selected folder contains a horizontal snap strip with every item, previous/next 44 px controls and an item count. Portrait media uses contain instead of cropping. Photo strips expose all 19/12 photos; normal desktop gallery limits are restored on resize. The rest of the portfolio remains a regular vertically scrolling page.
-
-## Direct swipe handling
-
-Compact strips follow horizontal pointer movement directly. A 24 px drag or a short, quick flick advances one item; smaller movements settle back in 160–260 ms. Horizontal intent locks after 6 px, pointer capture keeps the drag continuous, and the drag’s click is consumed before a video/photo viewer can open. A new tap clears that guard immediately. Vertical movement remains native; cancellation returns to the starting item. Arrows use the same measured card positions, rapid input replaces prior settling, keyboard arrows work, and reduced motion snaps instantly. A 24 px edge of the next card makes swiping discoverable.
-
-## Continuous opening
-
-Before opening, capture every folder’s viewport position. After the expanded layout settles, animate each shell from that position over 520 ms, with the selected frame revealing its full height through a clip. The media fades in after the cover starts moving. This makes the surrounding folders travel with the expansion instead of instantly turning into rows; no image is stretched vertically. Reduced motion skips the transition, and changing intent cancels it.
+- Motion 14.6.0 is self-hosted for media entry; its MIT license and provenance are in `assets/vendor`.
+- UI/UX Pro Max published guidance informed cancellable state transitions, touch targets, contrast and reduced motion: https://github.com/nextlevelbuilder/ui-ux-pro-max-skill.
+- 21st.dev accordion patterns informed single-open state, labelled regions, plus/minus controls and focus visibility: https://21st.dev/community/components/s/accordion. This is a native adaptation, not an installed React component.
