@@ -171,6 +171,11 @@ body.folders-ready { overflow-anchor:none; }
   body.folders-ready .folder-content .tile,
   .folder-content .photo-card { flex:0 0 100%; min-width:0; height:100%; scroll-snap-align:start; scroll-snap-stop:always; }
   body.folders-ready .folder-content .tile { display:flex; flex-direction:column; }
+  /* Override the Highlights desktop cards too; a block card collapses its absolute image. */
+  body.folders-ready #highlights .tile { display:flex; flex-direction:column; }
+  body.folders-ready #highlights .tile .poster,
+  body.folders-ready #highlights .tile:first-child .poster { flex:1; min-height:0; aspect-ratio:auto; }
+
   body.folders-ready .folder-content .tile .poster,
   body.folders-ready .folder-content .tile:first-child .poster { flex:1; min-height:0; aspect-ratio:auto; width:100%; }
   .folder-content .poster img, .folder-content .photo-card img { object-fit:contain; }
