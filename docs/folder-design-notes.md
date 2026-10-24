@@ -18,10 +18,14 @@ Tap opens. A 320 ms touch/pen hold previews the prints; moving more than 12 px c
 
 ## Tools and guidance
 
-- Motion 14.6.0 is self-hosted for media entry; its MIT license and provenance are in `assets/vendor`.
+- Motion 14.6.0 is self-hosted for folder height transitions; its MIT license and provenance are in `assets/vendor`.
 - UI/UX Pro Max published guidance informed cancellable state transitions, touch targets, contrast and reduced motion: https://github.com/nextlevelbuilder/ui-ux-pro-max-skill.
 - 21st.dev accordion patterns informed single-open state, labelled regions, plus/minus controls and focus visibility: https://21st.dev/community/components/s/accordion. This is a native adaptation, not an installed React component.
 
 ## Compact portfolio variant
 
-The large hero section and replay control are removed. The exact original SVG and montage now live in the top-left header mark, which stays legible while the montage runs on load and replays whenever the logo is pressed. Work follows the header immediately. The heading is a concise Portfolio h1, navigation is Work/Contact, and the contact area contains just its heading and two contact actions. All 22 films, 31 photos, folders, players and responsive interactions are preserved.
+The large hero section and replay control are removed. The exact original SVG and montage now live in the top-left header mark, which stays legible while the montage runs on load and replays whenever the logo is pressed. Work follows the header immediately. The heading is a concise Portfolio h1, navigation is Work/Contact, and the contact area contains just its heading and a WhatsApp action. All 22 films, 31 photos, folders, players and responsive interactions are preserved.
+
+## Light and dark themes
+
+A 44 px accessible switch toggles the existing dark palette and a warm cream light palette. Preference is stored locally and restored before paint. A native SVG cat walks to a hanging lamp, pulls the cord, and changes the theme at 850 ms; the cat leaves by 1900 ms. The scene never intercepts pointer input. Repeated presses cancel stale timers and reverse pending intent, and reduced motion applies the theme immediately. The source logo and all media remain unchanged. Email is removed from the contact UI.

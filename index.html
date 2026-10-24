@@ -3,6 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
+<script>try{document.documentElement.dataset.theme=localStorage.getItem('as-prime-theme')==='light'?'light':'dark'}catch(e){document.documentElement.dataset.theme='dark'}</script>
 <title>AS PRIME | Selected Work</title>
 <meta name="description" content="AS PRIME — end-to-end content production in the UAE. Exhibition films, brand content, reels, AI, 3D, CGI and fashion, food and product photography.">
 <link rel="icon" type="image/x-icon" sizes="16x16 32x32 48x48" href="/favicon.ico">
@@ -12,6 +13,7 @@
 <link rel="stylesheet" href="styles.css">
 <link rel="stylesheet" href="folders.css">
 <link rel="stylesheet" href="compact.css">
+<link rel="stylesheet" href="theme.css">
 </head>
 <body>
 <header>
@@ -21,8 +23,33 @@
     <span class="logo-window" aria-hidden="true"><span class="logo-scenes"></span><img class="projection-preload" src="assets/as-prime-projection.webp" width="3840" height="1920" decoding="async" alt=""></span>
   </span>
 </a>
-<nav aria-label="Main navigation"><a href="#work">WORK</a><a href="#contact">CONTACT</a></nav>
+<nav aria-label="Main navigation"><a href="#work">WORK</a><a href="#contact">CONTACT</a>
+<button class="theme-toggle" id="theme-toggle" type="button" role="switch" aria-checked="false" aria-label="Light mode" title="Switch to light mode" hidden>
+<svg class="theme-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M2 12h2m16 0h2M5 5l1.4 1.4m11.2 11.2L19 19M5 19l1.4-1.4M17.6 6.4L19 5"/></svg>
+<svg class="theme-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M20.5 14A8.5 8.5 0 0 1 10 3.5 8.5 8.5 0 1 0 20.5 14Z"/></svg>
+</button></nav>
 </header>
+<div class="theme-scene" id="theme-scene" aria-hidden="true" hidden>
+<svg viewBox="0 0 360 190" fill="none" xmlns="http://www.w3.org/2000/svg">
+<defs><radialGradient id="cat-light-halo"><stop stop-color="#ffe5a0" stop-opacity=".8"/><stop offset="1" stop-color="#ffe5a0" stop-opacity="0"/></radialGradient></defs>
+<g class="cat-lamp"><circle class="lamp-halo" cx="270" cy="67" r="100" fill="url(#cat-light-halo)"/>
+<path d="M270 0v44" stroke="currentColor" stroke-width="2"/>
+<path d="M259 47h22l6 20h-34l6-20Z" class="lamp-shade"/>
+<path d="M263 68a7 7 0 0 0 14 0" class="lamp-bulb"/>
+<g class="lamp-pull"><path d="M270 74v49" stroke="currentColor" stroke-width="1.5"/><circle cx="270" cy="125" r="3" fill="currentColor"/></g></g>
+<g class="cat-actor">
+<path class="cat-tail" d="M36 150C8 153 10 125 19 115" stroke="var(--cat-fill)" stroke-width="11" stroke-linecap="round"/>
+<path class="cat-body" d="M32 159c-8-25 0-40 18-40 19 0 32 15 32 39l-2 13H34l-2-12Z" fill="var(--cat-fill)"/>
+<g class="cat-back-leg"><path d="M39 157v16h13" stroke="var(--cat-fill)" stroke-width="11" stroke-linecap="round" stroke-linejoin="round"/></g>
+<g class="cat-front-leg"><path d="M68 154v19h12" stroke="var(--cat-fill)" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/></g>
+<path d="m64 108-1-26 20 13 17-12 3 28c1 15-9 24-21 23-14-1-23-11-18-26Z" fill="var(--cat-fill)"/>
+<path d="m68 92 2 11 7-5m19-6-1 11-7-5" fill="var(--cat-ear)"/>
+<path d="M75 112h1m15 0h1" stroke="var(--cat-eye)" stroke-width="3" stroke-linecap="round"/>
+<path d="m82 119 3 2 3-2m-3 3v4" stroke="var(--cat-eye)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="m71 122-12-2m12 6-12 2m36-6 12-2m-12 6 12 2" stroke="var(--cat-fill)" stroke-width="1.4" stroke-linecap="round"/>
+<g class="cat-paw"><path d="M78 146q22-5 22-23" stroke="var(--cat-fill)" stroke-width="11" stroke-linecap="round"/></g>
+</g></svg></div>
+<p class="sr-only" id="theme-status" role="status" aria-live="polite"></p>
 <main>
 <section class="portfolio-section" id="work" aria-labelledby="work-title">
 <div class="collection-heading"><div><div class="eyebrow">Content production / UAE</div><h1 id="work-title">Portfolio<span>.</span></h1></div><button class="collection-toggle" id="collection-toggle" type="button" aria-expanded="false" aria-controls="catalog" hidden>View all 22 films ↗</button></div>
@@ -131,7 +158,7 @@
 </section>
 <section class="section contact-section" id="contact" aria-labelledby="contact-title">
 <h2 id="contact-title">Get in touch<span>.</span></h2>
-<div class="contact-actions"><a class="button" href="https://wa.me/971501134339">WHATSAPP <span aria-hidden="true">↗</span></a><a class="button button-outline" href="mailto:ar.irshad11@gmail.com">EMAIL <span aria-hidden="true">↗</span></a></div>
+<div class="contact-actions"><a class="button" href="https://wa.me/971501134339">WHATSAPP <span aria-hidden="true">↗</span></a></div>
 </section></main>
 <footer><span>AS PRIME <span class="footer-separator">/</span> END-TO-END CONTENT PRODUCTION</span><a href="https://as-prime.com">AS-PRIME.COM ↗</a><a href="#">BACK TO TOP ↑</a></footer>
 <dialog id="modal" aria-labelledby="title" aria-describedby="details">
@@ -150,6 +177,7 @@
 <div class="photo-view"><img id="photo-full" alt=""></div>
 <div class="photo-controls"><button type="button" id="photo-prev" aria-label="Previous photo">←</button><span id="photo-count" role="status" aria-live="polite"></span><button type="button" id="photo-next" aria-label="Next photo">→</button></div>
 </dialog>
+<script src="theme.js" defer></script>
 <script src="photography.js" defer></script>
 <script src="portfolio.js" defer></script>
 <script src="assets/vendor/motion-14.6.0.js" defer></script>
