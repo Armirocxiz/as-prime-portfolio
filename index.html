@@ -10,6 +10,7 @@
 <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
 <link rel="stylesheet" href="reveal.css">
 <link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="folders.css">
 </head>
 <body>
 <header>
@@ -50,6 +51,32 @@
 <div class="collection-heading"><div><div class="eyebrow">End-to-end content production</div><h2 id="work-title">Selected work<span>.</span></h2></div><button class="collection-toggle" id="collection-toggle" type="button" aria-expanded="false" aria-controls="catalog" hidden>View all 22 films ↗</button></div>
 <p class="production-intro">From concept to final delivery. Film, photography and digital creation.</p>
 <p class="collection-status" id="collection-status" role="status" aria-live="polite">22 films</p>
+<div class="folder-browser" id="folder-browser" hidden>
+<div class="folder-stack" role="group" aria-label="Portfolio folders">
+<button class="work-folder" type="button" data-collection="highlights" style="--order:0" aria-label="Open Highlights: 9 films" aria-expanded="false" aria-controls="highlights">
+<span class="folder-back" aria-hidden="true"></span><span class="folder-tab" aria-hidden="true">01 / Highlights</span>
+<span class="folder-previews" aria-hidden="true"><span class="folder-print"><img src="assets/posters/CykQ7cmosV8.webp" alt="" loading="lazy" decoding="async"></span><span class="folder-print"><img src="assets/posters/ZsnbpzU47ZI.webp" alt="" loading="lazy" decoding="async"></span><span class="folder-print"><img src="assets/posters/FvZH7Wg7Y-U.webp" alt="" loading="lazy" decoding="async"></span></span>
+<span class="folder-cover"><span class="folder-label"><span class="folder-number">01</span><span class="folder-name">Highlights</span></span><span class="folder-meta"><span>9 films</span><span class="folder-arrow" aria-hidden="true">↗</span></span></span></button>
+<button class="work-folder" type="button" data-collection="ai" style="--order:1" aria-label="Open AI, 3D &amp; CGI: 6 films" aria-expanded="false" aria-controls="ai">
+<span class="folder-back" aria-hidden="true"></span><span class="folder-tab" aria-hidden="true">02 / AI, 3D &amp; CGI</span>
+<span class="folder-previews" aria-hidden="true"><span class="folder-print"><img src="assets/posters/L44ugCS6ekY.webp" alt="" loading="lazy" decoding="async"></span><span class="folder-print"><img src="assets/posters/-XoRdX4MGJ4.webp" alt="" loading="lazy" decoding="async"></span><span class="folder-print"><img src="assets/posters/z75wz71KKz0.webp" alt="" loading="lazy" decoding="async"></span></span>
+<span class="folder-cover"><span class="folder-label"><span class="folder-number">02</span><span class="folder-name">AI, 3D &amp; CGI</span></span><span class="folder-meta"><span>6 films</span><span class="folder-arrow" aria-hidden="true">↗</span></span></span></button>
+<button class="work-folder" type="button" data-collection="reels" style="--order:2" aria-label="Open Reels: 7 films" aria-expanded="false" aria-controls="reels">
+<span class="folder-back" aria-hidden="true"></span><span class="folder-tab" aria-hidden="true">03 / Reels</span>
+<span class="folder-previews" aria-hidden="true"><span class="folder-print"><img src="assets/posters/Hse6ee8_Ev8.webp" alt="" loading="lazy" decoding="async"></span><span class="folder-print"><img src="assets/posters/2Tf0JE0u3pA.webp" alt="" loading="lazy" decoding="async"></span><span class="folder-print"><img src="assets/posters/4h_ml2k2gL8.webp" alt="" loading="lazy" decoding="async"></span></span>
+<span class="folder-cover"><span class="folder-label"><span class="folder-number">03</span><span class="folder-name">Reels</span></span><span class="folder-meta"><span>7 films</span><span class="folder-arrow" aria-hidden="true">↗</span></span></span></button>
+<button class="work-folder" type="button" data-collection="photography" style="--order:3" aria-label="Open Fashion: 19 photographs" aria-expanded="false" aria-controls="photography">
+<span class="folder-back" aria-hidden="true"></span><span class="folder-tab" aria-hidden="true">04 / Fashion</span>
+<span class="folder-previews" aria-hidden="true"><span class="folder-print"><img src="assets/photography/fashion/fashion-01.webp" alt="" loading="lazy" decoding="async"></span><span class="folder-print"><img src="assets/photography/fashion/fashion-07.webp" alt="" loading="lazy" decoding="async"></span><span class="folder-print"><img src="assets/photography/fashion/fashion-15.webp" alt="" loading="lazy" decoding="async"></span></span>
+<span class="folder-cover"><span class="folder-label"><span class="folder-number">04</span><span class="folder-name">Fashion</span></span><span class="folder-meta"><span>19 photographs</span><span class="folder-arrow" aria-hidden="true">↗</span></span></span></button>
+<button class="work-folder" type="button" data-collection="food-photography" style="--order:4" aria-label="Open Food: 12 photographs" aria-expanded="false" aria-controls="food-photography">
+<span class="folder-back" aria-hidden="true"></span><span class="folder-tab" aria-hidden="true">05 / Food</span>
+<span class="folder-previews" aria-hidden="true"><span class="folder-print"><img src="assets/photography/food/food-02.webp" alt="" loading="lazy" decoding="async"></span><span class="folder-print"><img src="assets/photography/food/food-05.webp" alt="" loading="lazy" decoding="async"></span><span class="folder-print"><img src="assets/photography/food/food-10.webp" alt="" loading="lazy" decoding="async"></span></span>
+<span class="folder-cover"><span class="folder-label"><span class="folder-number">05</span><span class="folder-name">Food</span></span><span class="folder-meta"><span>12 photographs</span><span class="folder-arrow" aria-hidden="true">↗</span></span></span></button>
+</div>
+<div class="folder-caption"><span>THE WORK / FIVE COLLECTIONS</span><span class="folder-desktop-hint">Hover to preview · Click to open</span><span class="folder-touch-hint">Tap a folder to open</span></div>
+</div>
+<div class="collection-tools" id="collection-tools" hidden><p id="collection-label"></p><button class="folder-close" type="button" id="folder-close">Close folder ↑</button></div>
 <div id="catalog">
 <section class="section" id="highlights" aria-labelledby="highlights-title"><div class="section-heading"><h3 id="highlights-title">Highlights</h3><span class="collection-count">9 films</span></div><div class="project-grid">
 <article class="tile" tabindex="0" role="button" data-index="4" data-featured="true" aria-label="Play Kenz de Rasasi: Highlight film"><div class="poster"><img loading="lazy" decoding="async" src="assets/posters/CykQ7cmosV8.webp" alt="Kenz de Rasasi"><span class="play" aria-hidden="true">▶</span></div><h4>Kenz de Rasasi</h4><small>Highlight film</small><p class="tile-note">Fragrance, people and exhibition moments.</p></article>
@@ -150,7 +177,7 @@
 <div class="photo-controls"><button type="button" id="photo-prev" aria-label="Previous photo">←</button><span id="photo-count" role="status" aria-live="polite"></span><button type="button" id="photo-next" aria-label="Next photo">→</button></div>
 </dialog>
 <script src="photography.js" defer></script>
-<script src="portfolio.js" defer>
-</script>
+<script src="portfolio.js" defer></script>
+<script src="folders.js" defer></script>
 </body>
 </html>

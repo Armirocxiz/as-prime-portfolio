@@ -185,25 +185,6 @@ document.querySelectorAll('.tile').forEach(tile => {
   });
 });
 
-// A short opening selection; the complete archive remains in the document.
-const collectionToggle = document.getElementById('collection-toggle');
-const collectionTiles = Array.from(document.querySelectorAll('#catalog .tile'));
-let showAllFilms = false;
-function updateCollection() {
-  collectionTiles.forEach(tile => { tile.hidden = !showAllFilms && tile.dataset.featured !== 'true'; });
-  const shown = collectionTiles.filter(tile => !tile.hidden).length;
-  document.getElementById('collection-status').textContent = showAllFilms ? `All ${shown} films` : `${shown} selected films`;
-  collectionToggle.textContent = showAllFilms ? 'Show selected films' : `View all ${collectionTiles.length} films ↗`;
-  collectionToggle.setAttribute('aria-expanded', String(showAllFilms));
-  document.querySelectorAll('#catalog > .section').forEach(section => {
-    const visible = Array.from(section.querySelectorAll('.tile')).filter(tile => !tile.hidden).length;
-    section.querySelector('.collection-count').textContent = `${visible} ${section.id === 'reels' ? 'reels' : 'films'}`;
-  });
-}
-collectionToggle.hidden = false;
-collectionToggle.addEventListener('click', () => { showAllFilms = !showAllFilms; updateCollection(); });
-updateCollection();
-
 const stage = document.getElementById('logo-reveal');
 const replay = document.getElementById('replay-reveal');
 const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
