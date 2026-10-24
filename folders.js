@@ -15,7 +15,68 @@ const folderHover = window.matchMedia('(hover:hover) and (pointer:fine)');
 const collectionHomes = new Map();
 const folderPanels = new Map();
 let openFolder = null;
-let folderAnimation = null;
+const motionAnimate = window.Motion?.animate;
+folderBrowser.dataset.motionEngine = motionAnimate ? 'motion' : 'native';
+let activeAnimations = [];
+let transitionVersion = 0;
+let closingFolder = null;
+let finishPendingClose = null;
+
+function clearPanelStyles(panel) {
+  ['height', 'padding-top', 'padding-bottom', 'opacity'].forEach(property => panel.style.removeProperty(property));
+}
+
+function cancelFolderAnimations() {
+  activeAnimations.forEach(animation => animation.cancel());
+  activeAnimations = [];
+  folderPanels.forEach(clearPanelStyles);
+  folderStack.querySelectorAll('.tile, .photo-card').forEach(card => {
+    card.style.removeProperty('opacity');
+    card.style.removeProperty('transform');
+  });
+}
+
+function panelMetrics(panel) {
+  const style = getComputedStyle(panel);
+  return { height:panel.getBoundingClientRect().height, paddingTop:parseFloat(style.paddingTop), paddingBottom:parseFloat(style.paddingBottom), opacity:parseFloat(style.opacity) };
+}
+
+function animatePanel(panel, expanding, from = null) {
+  const metrics = from || panelMetrics(panel);
+  const values = expanding
+    ? { height:[0,metrics.height], paddingTop:[0,metrics.paddingTop], paddingBottom:[0,metrics.paddingBottom], opacity:[0,1] }
+    : { height:[metrics.height,0], paddingTop:[metrics.paddingTop,0], paddingBottom:[metrics.paddingBottom,0], opacity:[metrics.opacity,0] };
+  let animation;
+  if (motionAnimate) {
+    const controls = motionAnimate(panel, values, {
+      type:'spring', visualDuration:expanding ? .38 : .26, bounce:0,
+      opacity:{ type:'tween', duration:expanding ? .22 : .16, ease:'easeOut' }
+    });
+    animation = { cancel:() => controls.cancel(), finished:Promise.resolve(controls) };
+  } else {
+    // Folder browsing remains usable if the animation runtime cannot load.
+    const controls = panel.animate([
+      Object.fromEntries(Object.entries(values).map(([key,value]) => [key,key === 'opacity' ? value[0] : `${value[0]}px`])),
+      Object.fromEntries(Object.entries(values).map(([key,value]) => [key,key === 'opacity' ? value[1] : `${value[1]}px`]))
+    ], { duration:expanding ? 420 : 280, easing:'cubic-bezier(.2,.75,.2,1)' });
+    animation = { cancel:() => controls.cancel(), finished:controls.finished };
+  }
+  activeAnimations.push(animation);
+  return animation;
+}
+
+function revealProjects(panel, version) {
+  if (!motionAnimate || folderMotion.matches) return;
+  const cards = Array.from(panel.querySelectorAll('.tile:not([hidden]), .photo-card:not([hidden])')).slice(0,9);
+  const controls = motionAnimate(cards, { opacity:[0,1], y:[10,0] }, {
+    type:'tween', duration:.26, delay:window.Motion.stagger(.025, {startDelay:.08}), ease:[.2,.7,.2,1]
+  });
+  activeAnimations.push({ cancel:() => controls.cancel() });
+  Promise.resolve(controls).then(() => {
+    if (version !== transitionVersion) return;
+    cards.forEach(card => { card.style.removeProperty('opacity'); card.style.removeProperty('transform'); });
+  }).catch(() => {});
+}
 
 collectionSections.forEach(section => {
   const home = document.createComment(`Collection home: ${section.id}`);
@@ -33,23 +94,42 @@ folderButtons.forEach((button, index) => {
   panel.className = 'folder-content';
   panel.id = `folder-content-${button.dataset.collection}`;
   panel.hidden = true;
+  button.id = `folder-trigger-${button.dataset.collection}`;
   button.setAttribute('aria-controls', panel.id);
+  panel.setAttribute('role', 'region');
+  const name = button.querySelector('.folder-name');
+  name.id = `folder-name-${button.dataset.collection}`;
+  panel.setAttribute('aria-labelledby', name.id);
+  const icon = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+  icon.setAttribute('viewBox','0 0 24 24');
+  icon.setAttribute('fill','none');
+  icon.setAttribute('stroke','currentColor');
+  icon.setAttribute('stroke-width','1.5');
+  ['M5 12h14','M12 5v14'].forEach((line,index) => {
+    const path = document.createElementNS('http://www.w3.org/2000/svg','path');
+    path.setAttribute('d',line);
+    if (index) path.classList.add('folder-icon-vertical');
+    icon.append(path);
+  });
+  button.querySelector('.folder-arrow').replaceChildren(icon);
   shell.append(panel);
   folderPanels.set(button.dataset.collection, panel);
 });
 
 function resetFolders() {
-  folderAnimation?.cancel();
+  transitionVersion += 1;
+  cancelFolderAnimations();
+  closingFolder = null;
+  finishPendingClose = null;
   collectionSections.forEach(section => {
     collectionHomes.get(section).after(section);
     section.hidden = true;
   });
-  folderPanels.forEach(panel => { panel.hidden = true; });
+  folderPanels.forEach(panel => { panel.hidden = true; panel.inert = false; panel.removeAttribute('aria-hidden'); });
   folderButtons.forEach(button => {
     button.closest('.folder-shell').classList.remove('is-open');
     button.classList.remove('is-previewing');
     button.setAttribute('aria-expanded', 'false');
-    button.querySelector('.folder-arrow').textContent = '↗';
   });
   folderStack.classList.remove('has-open');
   document.getElementById('catalog').hidden = true;
@@ -77,15 +157,14 @@ function showCollection(id, { scroll = false, focus = true, updateUrl = true } =
     folderStack.classList.add('has-open');
     button.closest('.folder-shell').classList.add('is-open');
     button.setAttribute('aria-expanded', 'true');
-    button.querySelector('.folder-arrow').textContent = '−';
     if (focus) button.focus({ preventScroll:true });
-    // Animate the folder's real height so the other folders move down with it.
     if (!folderMotion.matches) {
-      const style = getComputedStyle(panel);
-      folderAnimation = panel.animate([
-        { height:'0px', paddingTop:'0px', paddingBottom:'0px', opacity:0 },
-        { height:`${panel.getBoundingClientRect().height}px`, paddingTop:style.paddingTop, paddingBottom:style.paddingBottom, opacity:1 }
-      ], { duration:480, easing:'cubic-bezier(.2,.75,.2,1)' });
+      const version = transitionVersion;
+      const animation = animatePanel(panel, true);
+      revealProjects(panel, version);
+      animation.finished.then(() => {
+        if (version === transitionVersion && openFolder === id) clearPanelStyles(panel);
+      }).catch(() => {});
     }
   }
   collectionToggle.textContent = id === 'all' ? 'Close film archive ↑' : 'View all 22 films ↗';
@@ -100,22 +179,39 @@ function showCollection(id, { scroll = false, focus = true, updateUrl = true } =
   }
 }
 
-function closeCollection({ scroll = false, focus = true, updateUrl = true } = {}) {
-  const previous = folderButtons.find(button => button.dataset.collection === openFolder);
+function closeCollection({ scroll = false, focus = true, updateUrl = true, animate = true } = {}) {
+  const previousId = openFolder || closingFolder;
+  const previous = folderButtons.find(button => button.dataset.collection === previousId);
   const sourceTop = previous?.getBoundingClientRect().top;
-  resetFolders();
+  const panel = folderPanels.get(previousId);
+  const from = panel && !panel.hidden ? panelMetrics(panel) : null;
+  transitionVersion += 1;
+  const version = transitionVersion;
+  cancelFolderAnimations();
+  // Semantic state changes immediately, even if an exit animation is interrupted.
   openFolder = null;
+  if (previous) previous.setAttribute('aria-expanded','false');
+  if (panel) { panel.inert = true; panel.setAttribute('aria-hidden','true'); }
   collectionToggle.textContent = 'View all 22 films ↗';
-  collectionToggle.setAttribute('aria-expanded', 'false');
+  collectionToggle.setAttribute('aria-expanded','false');
   if (updateUrl) history.replaceState(null, '', '#work');
-  if (focus) (previous || folderButtons[0]).focus({ preventScroll:true });
-  else folderButtons[0].classList.add('is-previewing');
-  if (!scroll && previous && sourceTop >= 83) {
-    window.scrollBy({ top:previous.getBoundingClientRect().top - sourceTop, behavior:'instant' });
-  } else if (!scroll && focus && previous && sourceTop < 83) {
-    previous.scrollIntoView({ behavior:'instant', block:'center' });
-  }
-  if (scroll) document.getElementById('work').scrollIntoView({ behavior:folderMotion.matches ? 'auto' : 'smooth', block:'start' });
+  const finish = () => {
+    if (version !== transitionVersion) return;
+    resetFolders();
+    if (focus) (previous || folderButtons[0]).focus({ preventScroll:true });
+    else folderButtons[0].classList.add('is-previewing');
+    if (!scroll && previous && sourceTop >= 83) {
+      window.scrollBy({ top:previous.getBoundingClientRect().top - sourceTop, behavior:'instant' });
+    } else if (!scroll && focus && previous && sourceTop < 83) {
+      previous.scrollIntoView({ behavior:'instant', block:'center' });
+    }
+    if (scroll) document.getElementById('work').scrollIntoView({ behavior:folderMotion.matches ? 'auto' : 'smooth', block:'start' });
+  };
+  if (from && animate && !scroll && !folderMotion.matches) {
+    closingFolder = previousId;
+    finishPendingClose = finish;
+    animatePanel(panel, false, from).finished.then(finish).catch(() => {});
+  } else finish();
 }
 
 folderButtons.forEach(button => {
@@ -179,4 +275,11 @@ window.addEventListener('hashchange', () => {
   } else if ((!hash || hash === 'work') && openFolder !== null) {
     closeCollection({focus:false,updateUrl:false});
   }
+});
+
+folderMotion.addEventListener('change', () => {
+  if (!folderMotion.matches) return;
+  const finish = finishPendingClose;
+  cancelFolderAnimations();
+  if (finish) finish();
 });

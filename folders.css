@@ -110,3 +110,27 @@ body.folders-ready .folder-content .section { margin:0; padding:0; border:0; }
 }
 
 body.folders-ready { overflow-anchor:none; }
+
+/* Accordion detail informed by 21st.dev patterns and the UI/UX guidance. */
+.folder-tab { font-size:12px; }
+.folder-meta, .folder-caption { font-size:12px; }
+.folder-caption { letter-spacing:.035em; }
+.folder-number { font-size:11px; }
+.folder-arrow { width:28px; height:28px; font-size:0; flex-shrink:0; }
+.folder-arrow svg { display:block; width:16px; height:16px; }
+.folder-icon-vertical { transform-origin:12px 12px; transition:transform .22s ease; }
+.work-folder[aria-expanded="true"] .folder-icon-vertical { transform:scaleY(0); }
+.folder-stack.has-open .folder-cover { transition:background .2s, border-color .2s; }
+.folder-stack.has-open .folder-name { font-weight:500; }
+.folder-stack.has-open .work-folder:hover .folder-cover { border-color:#ffffff65; background-color:#ffffff0c; }
+.folder-stack.has-open .is-open .folder-cover { border-color:#ffffff4a; border-bottom-color:#ffffff18; }
+.folder-content .tile small, .folder-content .tile-note { font-size:12px; line-height:1.6; }
+.folder-content .tile:focus-visible, .folder-content .photo-card:focus-visible { outline:2px solid #eeeae3; outline-offset:5px; }
+@media (max-width:650px) {
+  .folder-tab { font-size:11px; min-width:150px; }
+  .folder-meta, .folder-stack.has-open .folder-meta { font-size:12px; }
+  .folder-caption { font-size:11px; }
+  .folder-stack.has-open .folder-number { font-size:11px; }
+  .folder-caption > :last-child { max-width:48%; }
+}
+@media (prefers-reduced-motion:reduce) { .folder-icon-vertical { transition:none; } }
